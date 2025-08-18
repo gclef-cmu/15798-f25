@@ -3,13 +3,6 @@ name: Deploy README to GitHub Pages
 on:
   push:
     branches: [main]
-    paths:
-      - "**/*.md"
-      - ".github/workflows/deploy.yml"
-      - "render/convert.js"
-      - "render/index.html"
-      - "render/config.yml"
-      - "render/style.css"
   workflow_dispatch:
 
 permissions:
