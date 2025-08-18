@@ -86,21 +86,38 @@ function computeOutputHtmlPath(mdPath, repoRoot, outputRoot, homeMdBasename) {
     const rel = path.relative(repoRoot, mdPath);
     const base = path.basename(rel);
     const dir = path.dirname(rel);
-    let outName;
+    // Root home becomes root index.html
     if (base.toLowerCase() === homeMdBasename.toLowerCase() && dir === ".") {
-        outName = "index.html";
-    } else if (base.toLowerCase() === "readme.md" && dir !== ".") {
-        outName = "index.html";
-    } else {
-        outName = base.replace(/\.md$/i, ".html");
+        return path.join(outputRoot, "index.html");
     }
-    return path.join(outputRoot, dir === "." ? "" : dir, outName);
+    // README in subdirectories becomes that folder's index.html
+    if (base.toLowerCase() === "readme.md" && dir !== ".") {
+        return path.join(outputRoot, dir, "index.html");
+    }
+    // All other pages: create a folder named after the file and place index.html inside
+    const name = base.replace(/\.md$/i, "");
+    return path.join(
+        outputRoot,
+        dir === "." ? name : path.join(dir, name),
+        "index.html"
+    );
 }
 
 function toRelativeHref(fromDir, toFile) {
     let rel = path.relative(fromDir, toFile).split(path.sep).join("/");
     if (rel === "") rel = "index.html";
     return rel;
+}
+
+function toExtensionlessPath(href) {
+    // Strip trailing /index.html or index.html
+    if (href.endsWith("/index.html"))
+        return href.slice(0, -"/index.html".length);
+    if (href === "index.html") return "";
+    if (href.endsWith("index.html")) return href.slice(0, -"index.html".length);
+    // As a fallback, strip .html if present
+    if (href.endsWith(".html")) return href.slice(0, -5);
+    return href;
 }
 
 function rewriteLinksHtml(
@@ -146,8 +163,9 @@ function rewriteLinksHtml(
             outputRoot,
             homeMdBasename
         );
-        const relativeHref =
-            toRelativeHref(sourceOutDir, targetHtmlPath) + hash;
+        let relativeHref = toRelativeHref(sourceOutDir, targetHtmlPath);
+        relativeHref = toExtensionlessPath(relativeHref) + hash;
+        if (relativeHref === "") relativeHref = "." + hash; // link to current dir root
         a.setAttribute("href", relativeHref);
     });
 
@@ -227,25 +245,26 @@ function buildNavHtml(
     currentOutDir,
     siteTitle,
     homeOutPathAbsolute,
-    navTitleColor
+    navBackgroundColor
 ) {
     const links = navItems.map((item) => {
-        const href = toRelativeHref(currentOutDir, item.outPath);
-        return `<a href="${href}" style="margin-right:12px;">${escapeHtml(
-            item.title
-        )}</a>`;
+        const hrefFile = toRelativeHref(currentOutDir, item.outPath);
+        const href = toExtensionlessPath(hrefFile);
+        return `<a href="${href}">${escapeHtml(item.title)}</a>`;
     });
-    const homeHref = toRelativeHref(currentOutDir, homeOutPathAbsolute);
-    const titleStyle = navTitleColor
-        ? ` style="color:${escapeHtml(navTitleColor)}"`
+    const homeHrefFile = toRelativeHref(currentOutDir, homeOutPathAbsolute);
+    let homeHref = toExtensionlessPath(homeHrefFile);
+    if (homeHref === "") homeHref = ".";
+    const navStyle = navBackgroundColor
+        ? ` style="background:${escapeHtml(navBackgroundColor)}"`
         : "";
     const titleHtml = siteTitle
-        ? `<a href="${homeHref}" class="site-title"${titleStyle}>${escapeHtml(
+        ? `<a href="${homeHref}" class="site-title">${escapeHtml(
               siteTitle
           )}</a>`
         : "";
     return `
-<nav class="site-nav">
+<nav class="site-nav"${navStyle}>
   <div class="container">
     <div class="inner">${titleHtml}<span class="site-links">${links.join(
         " "
@@ -294,7 +313,7 @@ async function renderPage(mdPath, ctx) {
         homeMdBasename,
         navItems,
         siteTitle,
-        navTitleColor,
+        navBackgroundColor,
         stylesheetOut,
         configuredTitleByBase,
         homeOutPathAbsolute,
@@ -349,7 +368,7 @@ async function renderPage(mdPath, ctx) {
               path.dirname(pageOutputPath),
               siteTitle,
               homeOutPathAbsolute,
-              navTitleColor || null
+              navBackgroundColor || null
           )
         : "";
 
@@ -418,7 +437,7 @@ async function buildSite() {
             homeMdBasename,
             navItems,
             siteTitle: config.site_title,
-            navTitleColor: config.nav_title_color,
+            navBackgroundColor: config.nav_background_color,
             stylesheetOut,
             configuredTitleByBase,
             homeOutPathAbsolute,
