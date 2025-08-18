@@ -33,7 +33,7 @@ jobs:
         run: mkdir -p _site
 
       - name: Convert markdown to HTML
-        run: node render/convert.js
+        run: node .render/render.js
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
