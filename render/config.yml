@@ -4,6 +4,7 @@ nav:
   - README.md: "Home"
   - schedule.md: "Schedule"
   - syllabus.md: "Syllabus"
+  - resources.md: "Resources"
 style:
   nav_background: "#C41230"
   nav_title_color: "#FFFFFF"

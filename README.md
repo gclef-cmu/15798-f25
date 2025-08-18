@@ -8,19 +8,6 @@ This is a graduate level course on generative AI taught through the lens of musi
 - Instructor: [Chris Donahue](https://chrisdonahue.com/)
 - Office hours: W 2-3P, GHC 7127, or by appointment
 
-## Important links
-
-- **[Schedule](./schedule.md)**
-- [Google Calendar](https://calendar.google.com/calendar/u/0?cid=Y18xYzFkYzM0MDIyZjY3OGNhMjAwNWM1YWRlN2NiNjc2ZjE3ZTBhOGZjNmViNjM0NzAwYjlhOTUwN2RkMDVjYmFlQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20)
-- [Syllabus](./syllabus.md)
-- Piazza (for announcements and discussions)
-- Reading reflection submission form
-- Assignment submission form
-- Peer feedback form
-- Upload talk slides form
-
-## Resources
-
 ## Assignments
 
 Turn in all assignments using [this Google Form](https://forms.gle/1c9TZR1SBss8hXwd7).
