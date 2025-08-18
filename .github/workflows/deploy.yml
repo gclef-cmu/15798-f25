@@ -4,10 +4,10 @@ on:
   push:
     branches: [main]
     paths:
-      - "README.md"
+      - "**/*.md"
       - ".github/workflows/deploy.yml"
-      - "convert.js"
-      - "index.html"
+      - "render/convert.js"
+      - "render/index.html"
   workflow_dispatch:
 
 permissions:
@@ -37,8 +37,8 @@ jobs:
       - name: Create output directory
         run: mkdir -p _site
 
-      - name: Convert README to HTML
-        run: node convert.js
+      - name: Convert markdown to HTML
+        run: node render/convert.js
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

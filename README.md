@@ -10,8 +10,9 @@ This is a graduate level course on generative AI taught through the lens of musi
 
 ## Important links
 
-- **[Schedule](https://docs.google.com/spreadsheets/d/12Kafr6aprZ4euIV9A94T6k2lGxY6Tak4X1Se9j-9NcI/edit?usp=sharing)** and [Google Calendar](https://calendar.google.com/calendar/u/0?cid=Y18xYzFkYzM0MDIyZjY3OGNhMjAwNWM1YWRlN2NiNjc2ZjE3ZTBhOGZjNmViNjM0NzAwYjlhOTUwN2RkMDVjYmFlQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20)
-- [Syllabus](https://docs.google.com/document/d/1LEyZ6HCA66Jw9hZ4O9rr0QIYh9uOo1J20jZ-02_hiCk/edit?usp=sharing)
+- **[Schedule](./schedule.md)**
+- [Google Calendar](https://calendar.google.com/calendar/u/0?cid=Y18xYzFkYzM0MDIyZjY3OGNhMjAwNWM1YWRlN2NiNjc2ZjE3ZTBhOGZjNmViNjM0NzAwYjlhOTUwN2RkMDVjYmFlQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20)
+- [Syllabus](./syllabus.md)
 - Piazza (for announcements and discussions)
 - Reading reflection submission form
 - Assignment submission form
@@ -21,3 +22,9 @@ This is a graduate level course on generative AI taught through the lens of musi
 ## Resources
 
 ## Assignments
+
+Turn in all assignments using [this Google Form](https://forms.gle/1c9TZR1SBss8hXwd7).
+
+- [**Assignment 1**](https://docs.google.com/document/d/1JV2PEtk9QOTPHmqeQBMsTuAqsJ2NtmBFUo6KTIdHfnw/edit?usp=sharing), **due Fri Sep 12, 11:59PM**.
+- Assignment 2, link forthcoming, **due Fri Sep 26, 11:59PM**.
+- Assignment 3, link forthcoming, **due Fri Oct 10, 11:59PM**.
