@@ -8,6 +8,8 @@ on:
       - ".github/workflows/deploy.yml"
       - "render/convert.js"
       - "render/index.html"
+      - "render/config.yml"
+      - "render/style.css"
   workflow_dispatch:
 
 permissions:
@@ -32,7 +34,7 @@ jobs:
           node-version: "20"
 
       - name: Install dependencies
-        run: npm install marked dompurify jsdom
+        run: npm install marked dompurify jsdom js-yaml
 
       - name: Create output directory
         run: mkdir -p _site

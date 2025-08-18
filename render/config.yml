@@ -1,0 +1,7 @@
+site_title: "🎵 CMU 15798 F25"
+home_md: "README.md"
+nav_title_color: "#C41230"
+nav:
+  - README.md: "Home"
+  - schedule.md: "Schedule"
+  - syllabus.md: "Syllabus"

@@ -3,8 +3,11 @@ const path = require("path");
 const { marked } = require("marked");
 const DOMPurify = require("dompurify");
 const { JSDOM } = require("jsdom");
+const yaml = require("js-yaml");
 
-// Configure marked options
+// ----------------------------------------
+// Markdown renderer configuration
+// ----------------------------------------
 marked.setOptions({
     headerIds: true,
     mangle: false,
@@ -18,6 +21,9 @@ marked.setOptions({
     },
 });
 
+// ----------------------------------------
+// Helpers (pure or side-effect isolated)
+// ----------------------------------------
 function escapeHtml(text) {
     const map = {
         "&": "&amp;",
@@ -29,151 +35,30 @@ function escapeHtml(text) {
     return text.replace(/[&<>"']/g, (m) => map[m]);
 }
 
-async function convertAllMarkdownToHtml() {
-    try {
-        const repoRoot = process.cwd();
-        const outputRoot = path.join(repoRoot, "_site");
-        const templatePath = path.join(repoRoot, "render", "index.html");
-        const templateContent = await fs.readFile(templatePath, "utf-8");
-
-        const allMarkdownFiles = await findMarkdownFilesRecursively(repoRoot);
-        const rootMarkdownFiles = allMarkdownFiles.filter(
-            (p) => path.dirname(p) === repoRoot
+async function loadConfig(repoRoot) {
+    const configPath = path.join(repoRoot, "render", "config.yml");
+    const raw = await fs.readFile(configPath, "utf-8");
+    const cfg = yaml.load(raw) || {};
+    if (typeof cfg.site_title !== "string") {
+        throw new Error(
+            "render/config.yml missing required string: site_title"
         );
-
-        // Build navigation model from root-level markdown files only
-        const navItems = rootMarkdownFiles
-            .map((mdPath) => ({
-                mdPath,
-                title: computePageTitle(mdPath, repoRoot),
-                outPath: computeOutputHtmlPath(mdPath, repoRoot, outputRoot),
-            }))
-            // Ensure Home (README.md) is first, then alphabetical
-            .sort((a, b) => {
-                const aIsHome =
-                    path.basename(a.mdPath).toLowerCase() === "readme.md";
-                const bIsHome =
-                    path.basename(b.mdPath).toLowerCase() === "readme.md";
-                if (aIsHome && !bIsHome) return -1;
-                if (bIsHome && !aIsHome) return 1;
-                return a.title.localeCompare(b.title);
-            });
-
-        // Prepare DOMPurify
-        const purifyWindow = new JSDOM("").window;
-        const purify = DOMPurify(purifyWindow);
-
-        // Process each markdown file
-        for (const mdPath of allMarkdownFiles) {
-            const markdownContent = await fs.readFile(mdPath, "utf-8");
-
-            // Convert markdown to HTML
-            let htmlContent = marked(markdownContent);
-
-            // Sanitize
-            htmlContent = purify.sanitize(htmlContent, {
-                ADD_TAGS: ["iframe", "video", "audio", "source"],
-                ADD_ATTR: [
-                    "target",
-                    "rel",
-                    "frameborder",
-                    "allowfullscreen",
-                    "autoplay",
-                    "controls",
-                ],
-                ALLOW_DATA_ATTR: true,
-            });
-
-            // Rewrite links (.md -> .html) and preserve relative correctness
-            htmlContent = rewriteLinksHtml(
-                htmlContent,
-                mdPath,
-                repoRoot,
-                outputRoot
-            );
-
-            // Compute metadata
-            const title = computePageTitle(mdPath, repoRoot);
-            const description = extractDescription(htmlContent);
-
-            // Build navigation HTML (relative to this page's output dir)
-            const pageOutputPath = computeOutputHtmlPath(
-                mdPath,
-                repoRoot,
-                outputRoot
-            );
-            const navHtml = buildNavHtml(
-                navItems,
-                path.dirname(pageOutputPath)
-            );
-
-            // Compose final HTML using template
-            const finalHtml = templateContent
-                .replace("{{TITLE}}", escapeHtml(title))
-                .replace("{{DESCRIPTION}}", escapeHtml(description))
-                .replace("{{NAV}}", navHtml)
-                .replace("{{CONTENT}}", htmlContent);
-
-            // Ensure directory and write file
-            await fs.mkdir(path.dirname(pageOutputPath), { recursive: true });
-            await fs.writeFile(pageOutputPath, finalHtml);
-
-            console.log(
-                `✅ Built: ${path.relative(
-                    repoRoot,
-                    mdPath
-                )} -> ${path.relative(repoRoot, pageOutputPath)}`
-            );
-        }
-
-        console.log("📁 Output directory:", outputRoot);
-        console.log(
-            "🧭 Pages in nav:",
-            navItems.map((n) => n.title).join(", ")
+    }
+    if (typeof cfg.home_md !== "string") {
+        throw new Error("render/config.yml missing required string: home_md");
+    }
+    if (!Array.isArray(cfg.nav)) {
+        throw new Error(
+            "render/config.yml missing required array: nav (can be empty)"
         );
-    } catch (error) {
-        console.error("❌ Error converting markdown:", error);
-        process.exit(1);
     }
+    return cfg;
 }
 
-function extractDescription(htmlContent) {
-    const descMatch = htmlContent.match(/<p>(.+?)<\/p>/);
-    return descMatch
-        ? descMatch[1].replace(/<[^>]*>/g, "").substring(0, 160)
-        : "Documentation";
-}
-
-function toTitleCase(text) {
-    return text
-        .replace(/[\-_]+/g, " ")
-        .replace(/\s+/g, " ")
-        .trim()
-        .toLowerCase()
-        .replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-function computePageTitle(mdPath, repoRoot) {
-    const isRoot = path.dirname(mdPath) === repoRoot;
-    const base = path.basename(mdPath);
-    if (isRoot && base.toLowerCase() === "readme.md") {
-        return "Home";
-    }
-    const nameWithoutExt = base.replace(/\.md$/i, "");
-    return toTitleCase(nameWithoutExt);
-}
-
-function computeOutputHtmlPath(mdPath, repoRoot, outputRoot) {
-    const rel = path.relative(repoRoot, mdPath);
-    const base = path.basename(rel);
-    const dir = path.dirname(rel);
-    let outName;
-    if (base.toLowerCase() === "readme.md") {
-        outName = "index.html";
-    } else {
-        outName = base.replace(/\.md$/i, ".html");
-    }
-    return path.join(outputRoot, dir === "." ? "" : dir, outName);
+async function readFirstH1(mdAbsPath) {
+    const raw = await fs.readFile(mdAbsPath, "utf-8");
+    const m = raw.match(/^#\s+(.+)$/m);
+    return m ? m[1].trim() : null;
 }
 
 async function findMarkdownFilesRecursively(startDir) {
@@ -197,20 +82,19 @@ async function findMarkdownFilesRecursively(startDir) {
     return results;
 }
 
-function buildNavHtml(navItems, currentOutDir) {
-    const links = navItems.map((item) => {
-        const href = toRelativeHref(currentOutDir, item.outPath);
-        return `<a href="${href}" style="margin-right:12px;">${escapeHtml(
-            item.title
-        )}</a>`;
-    });
-    return `
-<nav class="site-nav">
-  <div class="container">
-    ${links.join(" ")}
-  </div>
-</nav>
-`;
+function computeOutputHtmlPath(mdPath, repoRoot, outputRoot, homeMdBasename) {
+    const rel = path.relative(repoRoot, mdPath);
+    const base = path.basename(rel);
+    const dir = path.dirname(rel);
+    let outName;
+    if (base.toLowerCase() === homeMdBasename.toLowerCase() && dir === ".") {
+        outName = "index.html";
+    } else if (base.toLowerCase() === "readme.md" && dir !== ".") {
+        outName = "index.html";
+    } else {
+        outName = base.replace(/\.md$/i, ".html");
+    }
+    return path.join(outputRoot, dir === "." ? "" : dir, outName);
 }
 
 function toRelativeHref(fromDir, toFile) {
@@ -219,12 +103,23 @@ function toRelativeHref(fromDir, toFile) {
     return rel;
 }
 
-function rewriteLinksHtml(htmlContent, sourceMdPath, repoRoot, outputRoot) {
+function rewriteLinksHtml(
+    htmlContent,
+    sourceMdPath,
+    repoRoot,
+    outputRoot,
+    homeMdBasename
+) {
     const dom = new JSDOM(`<!DOCTYPE html><body>${htmlContent}</body>`);
     const document = dom.window.document;
     const anchors = document.querySelectorAll("a[href]");
     const sourceOutDir = path.dirname(
-        computeOutputHtmlPath(sourceMdPath, repoRoot, outputRoot)
+        computeOutputHtmlPath(
+            sourceMdPath,
+            repoRoot,
+            outputRoot,
+            homeMdBasename
+        )
     );
 
     anchors.forEach((a) => {
@@ -248,7 +143,8 @@ function rewriteLinksHtml(htmlContent, sourceMdPath, repoRoot, outputRoot) {
         const targetHtmlPath = computeOutputHtmlPath(
             resolvedTarget,
             repoRoot,
-            outputRoot
+            outputRoot,
+            homeMdBasename
         );
         const relativeHref =
             toRelativeHref(sourceOutDir, targetHtmlPath) + hash;
@@ -258,5 +154,289 @@ function rewriteLinksHtml(htmlContent, sourceMdPath, repoRoot, outputRoot) {
     return document.body.innerHTML;
 }
 
-// Run the conversion
-convertAllMarkdownToHtml();
+async function copyStylesheet(repoRoot, outputRoot) {
+    const src = path.join(repoRoot, "render", "style.css");
+    const dest = path.join(outputRoot, "assets", "style.css");
+    await fs.mkdir(path.dirname(dest), { recursive: true });
+    try {
+        const css = await fs.readFile(src);
+        await fs.writeFile(dest, css);
+        return dest;
+    } catch {
+        return null; // optional stylesheet
+    }
+}
+
+async function readTemplate(repoRoot) {
+    const templatePath = path.join(repoRoot, "render", "index.html");
+    return fs.readFile(templatePath, "utf-8");
+}
+
+function buildConfiguredTitleMap(nav) {
+    const byBase = {};
+    for (const item of nav) {
+        if (item && typeof item === "object") {
+            const key = Object.keys(item)[0];
+            byBase[path.basename(key)] = String(item[key]);
+        }
+    }
+    return byBase;
+}
+
+async function buildNavItems(config, repoRoot, outputRoot, homeMdBasename) {
+    // Build navigation model from config.nav only (no inference)
+    const items = await Promise.all(
+        config.nav
+            .map((item) => {
+                if (typeof item === "string")
+                    return { file: item, title: null };
+                if (item && typeof item === "object") {
+                    const key = Object.keys(item)[0];
+                    return { file: key, title: item[key] };
+                }
+                return null;
+            })
+            .filter(Boolean)
+            .map(async (entry) => {
+                const mdPath = path.join(repoRoot, entry.file);
+                let title = entry.title
+                    ? String(entry.title)
+                    : (await readFirstH1(mdPath)) ||
+                      (path.basename(mdPath).toLowerCase() ===
+                          homeMdBasename.toLowerCase() &&
+                      path.dirname(mdPath) === repoRoot
+                          ? "Home"
+                          : path.basename(mdPath).replace(/\.md$/i, ""));
+                return {
+                    mdPath,
+                    title,
+                    outPath: computeOutputHtmlPath(
+                        mdPath,
+                        repoRoot,
+                        outputRoot,
+                        homeMdBasename
+                    ),
+                };
+            })
+    );
+    return items;
+}
+
+function buildNavHtml(
+    navItems,
+    currentOutDir,
+    siteTitle,
+    homeOutPathAbsolute,
+    navTitleColor
+) {
+    const links = navItems.map((item) => {
+        const href = toRelativeHref(currentOutDir, item.outPath);
+        return `<a href="${href}" style="margin-right:12px;">${escapeHtml(
+            item.title
+        )}</a>`;
+    });
+    const homeHref = toRelativeHref(currentOutDir, homeOutPathAbsolute);
+    const titleStyle = navTitleColor
+        ? ` style="color:${escapeHtml(navTitleColor)}"`
+        : "";
+    const titleHtml = siteTitle
+        ? `<a href="${homeHref}" class="site-title"${titleStyle}>${escapeHtml(
+              siteTitle
+          )}</a>`
+        : "";
+    return `
+<nav class="site-nav">
+  <div class="container">
+    <div class="inner">${titleHtml}<span class="site-links">${links.join(
+        " "
+    )}</span></div>
+  </div>
+</nav>
+`;
+}
+
+function computePageTitle(
+    mdPath,
+    markdownContent,
+    repoRoot,
+    homeMdBasename,
+    configuredTitleByBase
+) {
+    const base = path.basename(mdPath);
+    if (configuredTitleByBase[base]) return configuredTitleByBase[base];
+    const h1Match = markdownContent.match(/^#\s+(.+)$/m);
+    if (h1Match) return h1Match[1].trim();
+    if (
+        path.dirname(mdPath) === repoRoot &&
+        base.toLowerCase() === homeMdBasename.toLowerCase()
+    ) {
+        return "Home";
+    }
+    return base.replace(/\.md$/i, "");
+}
+
+function extractDescription(htmlContent) {
+    const descMatch = htmlContent.match(/<p>(.+?)<\/p>/);
+    return descMatch
+        ? descMatch[1].replace(/<[^>]*>/g, "").substring(0, 160)
+        : "Documentation";
+}
+
+// ----------------------------------------
+// Main flow
+// ----------------------------------------
+async function renderPage(mdPath, ctx) {
+    const {
+        repoRoot,
+        outputRoot,
+        templateContent,
+        purify,
+        homeMdBasename,
+        navItems,
+        siteTitle,
+        navTitleColor,
+        stylesheetOut,
+        configuredTitleByBase,
+        homeOutPathAbsolute,
+    } = ctx;
+
+    const markdownContent = await fs.readFile(mdPath, "utf-8");
+
+    // Convert and sanitize
+    let htmlContent = marked(markdownContent);
+    htmlContent = purify.sanitize(htmlContent, {
+        ADD_TAGS: ["iframe", "video", "audio", "source"],
+        ADD_ATTR: [
+            "target",
+            "rel",
+            "frameborder",
+            "allowfullscreen",
+            "autoplay",
+            "controls",
+        ],
+        ALLOW_DATA_ATTR: true,
+    });
+
+    // Rewrite .md links
+    htmlContent = rewriteLinksHtml(
+        htmlContent,
+        mdPath,
+        repoRoot,
+        outputRoot,
+        homeMdBasename
+    );
+
+    // Metadata
+    const title = computePageTitle(
+        mdPath,
+        markdownContent,
+        repoRoot,
+        homeMdBasename,
+        configuredTitleByBase
+    );
+    const description = extractDescription(htmlContent);
+
+    // Paths and nav
+    const pageOutputPath = computeOutputHtmlPath(
+        mdPath,
+        repoRoot,
+        outputRoot,
+        homeMdBasename
+    );
+    const navHtml = navItems.length
+        ? buildNavHtml(
+              navItems,
+              path.dirname(pageOutputPath),
+              siteTitle,
+              homeOutPathAbsolute,
+              navTitleColor || null
+          )
+        : "";
+
+    const stylesheetHref = stylesheetOut
+        ? toRelativeHref(path.dirname(pageOutputPath), stylesheetOut).replace(
+              /\\/g,
+              "/"
+          )
+        : "";
+
+    const finalHtml = templateContent
+        .replace("{{TITLE}}", escapeHtml(title))
+        .replace("{{DESCRIPTION}}", escapeHtml(description))
+        .replace("{{NAV}}", navHtml)
+        .replace("{{STYLESHEET_HREF}}", stylesheetHref)
+        .replace("{{CONTENT}}", htmlContent);
+
+    await fs.mkdir(path.dirname(pageOutputPath), { recursive: true });
+    await fs.writeFile(pageOutputPath, finalHtml);
+
+    console.log(
+        `✅ Built: ${path.relative(repoRoot, mdPath)} -> ${path.relative(
+            repoRoot,
+            pageOutputPath
+        )}`
+    );
+}
+
+async function buildSite() {
+    const repoRoot = process.cwd();
+    const outputRoot = path.join(repoRoot, "_site");
+    const templateContent = await readTemplate(repoRoot);
+    const config = await loadConfig(repoRoot);
+    const homeMdBasename = path.basename(config.home_md);
+
+    // Assets and inputs
+    const stylesheetOut = await copyStylesheet(repoRoot, outputRoot);
+    const allMarkdownFiles = await findMarkdownFilesRecursively(repoRoot);
+
+    // Nav
+    const navItems = await buildNavItems(
+        config,
+        repoRoot,
+        outputRoot,
+        homeMdBasename
+    );
+    const configuredTitleByBase = buildConfiguredTitleMap(config.nav);
+    const homeAbs = path.join(repoRoot, config.home_md);
+    const homeOutPathAbsolute = computeOutputHtmlPath(
+        homeAbs,
+        repoRoot,
+        outputRoot,
+        homeMdBasename
+    );
+
+    // Sanitizer
+    const purify = DOMPurify(new JSDOM("").window);
+
+    // Render all pages
+    for (const mdPath of allMarkdownFiles) {
+        await renderPage(mdPath, {
+            repoRoot,
+            outputRoot,
+            templateContent,
+            purify,
+            homeMdBasename,
+            navItems,
+            siteTitle: config.site_title,
+            navTitleColor: config.nav_title_color,
+            stylesheetOut,
+            configuredTitleByBase,
+            homeOutPathAbsolute,
+        });
+    }
+
+    console.log("📁 Output directory:", outputRoot);
+    if (navItems.length) {
+        console.log(
+            "🧭 Pages in nav:",
+            navItems.map((n) => n.title).join(", ")
+        );
+    } else {
+        console.log("🧭 No nav configured");
+    }
+}
+
+// ----------------------------------------
+// Execute
+// ----------------------------------------
+buildSite();
