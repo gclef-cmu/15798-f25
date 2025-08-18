@@ -17,6 +17,7 @@
                 --code-bg: #f6f8fa;
                 --header-bg: #f6f8fa;
                 --shadow: 0 1px 3px rgba(31, 35, 40, 0.12);
+                --nav-offset: 56px;
             }
 
             @media (prefers-color-scheme: dark) {
@@ -44,6 +45,7 @@
                 color: var(--text-color);
                 background: var(--bg-color);
                 font-size: 16px;
+                padding-top: var(--nav-offset);
             }
 
             .container {
@@ -250,6 +252,22 @@
                 margin: 16px 0;
             }
 
+            /* Site navigation (fixed, full viewport width) */
+            .site-nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: var(--header-bg);
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .site-nav .container {
+                padding-top: 12px;
+                padding-bottom: 12px;
+            }
+
             /* Print styles */
             @media print {
                 body {
@@ -264,6 +282,7 @@
         </style>
     </head>
     <body>
+        {{NAV}}
         <main class="container">{{CONTENT}}</main>
     </body>
 </html>

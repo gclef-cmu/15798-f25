@@ -111,7 +111,8 @@ async function convertAllMarkdownToHtml() {
             const finalHtml = templateContent
                 .replace("{{TITLE}}", escapeHtml(title))
                 .replace("{{DESCRIPTION}}", escapeHtml(description))
-                .replace("{{CONTENT}}", navHtml + htmlContent);
+                .replace("{{NAV}}", navHtml)
+                .replace("{{CONTENT}}", htmlContent);
 
             // Ensure directory and write file
             await fs.mkdir(path.dirname(pageOutputPath), { recursive: true });
@@ -204,8 +205,8 @@ function buildNavHtml(navItems, currentOutDir) {
         )}</a>`;
     });
     return `
-<nav style="position:sticky;top:0;z-index:10;background:var(--header-bg);border-bottom:1px solid var(--border-color);">
-  <div class="container" style="padding-top:12px;padding-bottom:12px;">
+<nav class="site-nav">
+  <div class="container">
     ${links.join(" ")}
   </div>
 </nav>
