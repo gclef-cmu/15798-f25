@@ -45,6 +45,15 @@ body {
     padding: var(--content-padding);
 }
 
+/* Reduce top gap below fixed nav */
+main.container {
+    padding-top: calc(var(--content-padding) - 12px);
+}
+
+main.container > h1:first-child {
+    margin-top: 8px;
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 1rem;

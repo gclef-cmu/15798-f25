@@ -110,12 +110,10 @@ function toRelativeHref(fromDir, toFile) {
 }
 
 function toExtensionlessPath(href) {
-    // Strip trailing /index.html or index.html
     if (href.endsWith("/index.html"))
         return href.slice(0, -"/index.html".length);
     if (href === "index.html") return "";
     if (href.endsWith("index.html")) return href.slice(0, -"index.html".length);
-    // As a fallback, strip .html if present
     if (href.endsWith(".html")) return href.slice(0, -5);
     return href;
 }
@@ -150,7 +148,6 @@ function rewriteLinksHtml(
         const baseHref = hashIndex >= 0 ? rawHref.slice(0, hashIndex) : rawHref;
         const hash = hashIndex >= 0 ? rawHref.slice(hashIndex) : "";
 
-        // Only rewrite .md links
         if (!/\.md$/i.test(baseHref)) return;
 
         const resolvedTarget = path.resolve(
@@ -165,7 +162,7 @@ function rewriteLinksHtml(
         );
         let relativeHref = toRelativeHref(sourceOutDir, targetHtmlPath);
         relativeHref = toExtensionlessPath(relativeHref) + hash;
-        if (relativeHref === "") relativeHref = "." + hash; // link to current dir root
+        if (relativeHref === "") relativeHref = "." + hash;
         a.setAttribute("href", relativeHref);
     });
 
@@ -202,7 +199,6 @@ function buildConfiguredTitleMap(nav) {
 }
 
 async function buildNavItems(config, repoRoot, outputRoot, homeMdBasename) {
-    // Build navigation model from config.nav only (no inference)
     const items = await Promise.all(
         config.nav
             .map((item) => {
@@ -245,21 +241,30 @@ function buildNavHtml(
     currentOutDir,
     siteTitle,
     homeOutPathAbsolute,
-    navBackgroundColor
+    styleOpts
 ) {
+    const { navBackground, navTitleColor, navLinkColor } = styleOpts || {};
     const links = navItems.map((item) => {
         const hrefFile = toRelativeHref(currentOutDir, item.outPath);
         const href = toExtensionlessPath(hrefFile);
-        return `<a href="${href}">${escapeHtml(item.title)}</a>`;
+        const colorStyle = navLinkColor
+            ? ` color:${escapeHtml(navLinkColor)};`
+            : "";
+        return `<a href="${href}" style="margin-right:12px;${colorStyle}">${escapeHtml(
+            item.title
+        )}</a>`;
     });
     const homeHrefFile = toRelativeHref(currentOutDir, homeOutPathAbsolute);
     let homeHref = toExtensionlessPath(homeHrefFile);
     if (homeHref === "") homeHref = ".";
-    const navStyle = navBackgroundColor
-        ? ` style="background:${escapeHtml(navBackgroundColor)}"`
+    const navStyle = navBackground
+        ? ` style="background:${escapeHtml(navBackground)}"`
+        : "";
+    const titleColorStyle = navTitleColor
+        ? ` style="color:${escapeHtml(navTitleColor)}"`
         : "";
     const titleHtml = siteTitle
-        ? `<a href="${homeHref}" class="site-title">${escapeHtml(
+        ? `<a href="${homeHref}" class="site-title"${titleColorStyle}>${escapeHtml(
               siteTitle
           )}</a>`
         : "";
@@ -313,7 +318,7 @@ async function renderPage(mdPath, ctx) {
         homeMdBasename,
         navItems,
         siteTitle,
-        navBackgroundColor,
+        styleOpts,
         stylesheetOut,
         configuredTitleByBase,
         homeOutPathAbsolute,
@@ -368,7 +373,7 @@ async function renderPage(mdPath, ctx) {
               path.dirname(pageOutputPath),
               siteTitle,
               homeOutPathAbsolute,
-              navBackgroundColor || null
+              styleOpts
           )
         : "";
 
@@ -424,6 +429,14 @@ async function buildSite() {
         homeMdBasename
     );
 
+    // Style options
+    const style = config.style || {};
+    const styleOpts = {
+        navBackground: style.nav_background || null,
+        navTitleColor: style.nav_title_color || null,
+        navLinkColor: style.nav_link_color || null,
+    };
+
     // Sanitizer
     const purify = DOMPurify(new JSDOM("").window);
 
@@ -437,7 +450,7 @@ async function buildSite() {
             homeMdBasename,
             navItems,
             siteTitle: config.site_title,
-            navBackgroundColor: config.nav_background_color,
+            styleOpts,
             stylesheetOut,
             configuredTitleByBase,
             homeOutPathAbsolute,
