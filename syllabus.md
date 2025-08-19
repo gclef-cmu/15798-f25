@@ -4,6 +4,7 @@
 - **Meeting Days, Times, Location**: MW 12:30-1:50P GHC 4101
 - **Semester**: Fall 2025
 - **Units**: 12
+- **Website**: https://gclef-cmu.github.io/15798-f25
 
 ## Instructor
 
@@ -12,25 +13,26 @@
 - **Office hours**: Wednesday 2-3p (right after class), Or by appointment
 - **Office location**: GHC 7127
 
-## Key links:
-
-- [Course page](https://gclef-cmu.github.io/15798-f25)
-- [Schedule spreadsheet](https://docs.google.com/spreadsheets/d/12Kafr6aprZ4euIV9A94T6k2lGxY6Tak4X1Se9j-9NcI) and [Google Calendar](https://calendar.google.com/calendar/u/0?cid=Y18xYzFkYzM0MDIyZjY3OGNhMjAwNWM1YWRlN2NiNjc2ZjE3ZTBhOGZjNmViNjM0NzAwYjlhOTUwN2RkMDVjYmFlQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20)
-- [Piazza](https://piazza.com/cmu/fall2025/15798)
-
 ---
 
 ## Course Overview
 
-This is a graduate level course on generative AI taught through the lens of music and audio. You will learn about the operation of state-of-the-art commercial generative AI systems such as Suno, evaluation techniques for subjective tasks, and the broader societal implications of generative AI technology. Methods for generative AI are increasingly consolidating across modalities—while our focus here will be on the domain-specific application of generative AI, many of the skills you learn will transfer to other modalities such as audio, images, video, or even text. A key focus will also be on writing and oral communication skills in research, which will transfer to any other research pursuit.
+This is a **graduate level course on generative AI taught through the lens of music and audio** taught by [Chris Donahue](https://chrisdonahue.com). We aim to study this topic _holistically_, covering everything from the **core ML methods** behind state-of-the-art music AI systems such as [Suno](https://suno.com), to principles of **interaction** with music AI systems, to the **broader societal implications** of music AI.
 
-### Major activities for the course include:
+Methods for generative AI are increasingly consolidating across modalities. Our focus here will be on the domain-specific application of generative AI to music and audio, though many of the skills you learn will transfer to other modalities such as speech, images, video, or even text. A key focus will also be on writing and oral communication skills in research, which will transfer to any other research pursuit.
+
+This is the first time this course has been offered. **Expect some bumps in the road!** Your instructor values candid feedback, so please feel free to [provide anonymous feedback at any time](https://forms.gle/7918wxczytxWu67G9). There will also be an opportunity on Oct 6 to provide anonymous/collective feedback through a session with a representative from CMU's Eberly Center.
+
+### Major activities for the course include
+
+See the [activities](./activities) page for more details.
 
 **Engaging with research papers:**
 
 - Reading and writing reflections for 20+ research papers
-- Participating in discussions for 30+ papers
+- Participating in in-class discussions for 30+ papers
 - Leading a presentation on 2 research papers
+- Submitting peer feedback on presentations you attend
 
 **Completing Python/PyTorch-based assignments** that will task you to:
 
@@ -46,10 +48,10 @@ This is a graduate level course on generative AI taught through the lens of musi
 
 ## Prerequisites
 
-- Graduate students in SCS and ECE are admitted without prerequisites, although relevant undergraduate coursework is recommended (see below).
+- Graduate students in SCS and ECE are admitted without prerequisites, although relevant background coursework is recommended (see below).
 - Other students who have already conducted related research or have relevant background coursework may be admitted at instructor discretion.
 
-**(Informal)** To succeed in the course, it is encouraged that all students have previously taken courses in: AI/ML, deep learning, signal processing, software engineering or programming (especially Python), and algorithms. We will assume background knowledge on fundamental generative AI topics like backpropagation and deep learning architectures.
+**(Informal)** To succeed in the course, it is encouraged that all students have previously taken courses in: AI/ML, deep learning, signal processing, software engineering or programming (especially Python), and algorithms. We will assume background knowledge on fundamental generative AI topics like deep learning architectures and backpropagation.
 
 It is also recommended that students have at least some background knowledge in music (e.g., can play an instrument and read sheet music) or coursework in computer music (e.g., took 15-322/622 at CMU).
 
@@ -60,43 +62,17 @@ By the end of the semester, students will be able to:
 - Understand the inner workings of state-of-the-art generative AI systems for music, audio, and beyond
 - Engage with AI research at a scholarly level through written and oral argument
 - Implement, train, and evaluate modern generative AI systems at small scales
-- Investigate novel ideas and make new scholarly arguments through an original research project
+- Conduct original research in generative AI for music and audio
 
-These skills are designed to help you conduct original research in generative AI for multimedia like music, audio, and even language, images or video (many of the methods in generative AI are now standardized across modalities). Such research may be published in domain-specific venues (ISMIR, ICASSP, NIME, ICMC, CMJ, etc.) or general AI venues (NeurIPS, ICML, ICLR, etc.). Your participation in written reflections and oral discussions on research papers will also help strengthen your general writing and speaking skills in research.
+These skills are designed to help you conduct original research in generative AI for multimedia like music, audio, and even language, images or video (many of the methods in generative AI are now standardized across modalities). Such research may be published in music-specific venues (ISMIR, ICASSP, NIME, ICMC, CMJ, etc.) or general AI venues (NeurIPS, ICML, ICLR, etc.). Your participation in writing reflections and oral discussions on research papers will also help strengthen your general writing and speaking skills in research.
 
-## Activity: Reading Papers
+## Activities
 
-Over the course of the semester, you will read 20+ research papers covering a wide range of topics in generative AI. We will start with a narrow focus on modern generative AI methods, and then zoom out to a broader view of music AI as a discipline that expands far beyond generation (music information retrieval, control, evaluation, interaction, ethics, etc.).
+You will be expected to complete
 
-In a standard week (exceptions will be noted on the schedule), you will be expected to read 2 papers (one per class session) and submit reading reflections on each. Your instructor will provide feedback both on the technical content of your reflection and the writing quality. You will also participate in in-class discussions for 3-4 papers, though 1-2 of these papers will be optional.
+## Attendance
 
-For 2 papers a semester (one mandatory and one optional), you will prepare a 15m oral presentation (with slides) on that paper to present to the class. Having students "divide and conquer" a set of optional readings allows us to scale up the number of papers we can cover and discuss as a group, while keeping the workload manageable.
-
-While you are of course welcome to read as many papers as you like, we advise that you do not jump too far ahead in the readings for the semester. Readings are subject to change depending on pace and interests in the class.
-
-## Activity: Assignments
-
-During the first half of the semester, you will complete three Python assignments which are intended to both sharpen your fundamentals and prepare you for more open-ended research. Accordingly, each assignment will have two sections: (1) a close-ended section with well-specified programming tasks, and (2) an open-ended section with underspecified instructions aimed to encourage ambitious exploration of the topic of the assignment.
-
-The two section design of these assignments is also intended to confront the evolving landscape of engineering and research, one where generative AI often plays an important role. It is important to both understand the fundamentals, and to know how to use AI tools to accomplish more ambitious goals while adhering to these principles. Accordingly, your instructor expects that you complete the initial close-ended section by hand (without AI), and encourages you to use generative AI to the fullest extent in the open-ended section to accomplish ambitious goals.
-
-**Working in pairs.** You are expected to complete the close-ended section by yourself. After completing it, you are welcome to work with one other student on the open-ended section. You are each expected to turn in your own assignment submission which will also describe a clear division of labor between you and your partner on the open-ended section.
-
-## Activity: Quizzes
-
-There will be 3-5 quizzes in the course (to be determined based on workload) to assess your understanding of the papers we read, assignments you complete, and discussions you participate in. These quizzes will cover specific units (they are not cumulative). All questions will be based on the papers, discussion questions, and close-ended portions of assignments. Exams will be fully open book (you may bring as many sheets of paper as you want), but not open laptop.
-
-## Activity: Final Project
-
-In the second half of the semester, you will complete an open-ended research project in music or audio AI, building on the knowledge gained through reading papers and the implementation skills gained through assignments. Your deliverables are: (1) a 6+ page research report detailing your project, similar in scope to the papers we read in class and (2) a 10 minute oral presentation on your project during the last week of class. To keep things on track, every two weeks you will be expected to turn in drafts of different sections of your paper and report on your experimental progress.
-
-The class project will prepare you to conduct original music AI research and reason about your design choices. As a "stretch goal", you might aim to continue your research project at the end of the semester and publish it. You will almost certainly fail to develop something publication-worthy in two months -- but aim to do so anyway!
-
-**(Alternative)** Students with more of a background in music may also compose and perform an original piece of music incorporating AI for their final project. In this project, AI must serve a novel, non-trivial role in your live performance. You will also be expected to deliver a 4+ page report detailing your composition, your intention, the technical manner in which you used AI, and how your novel use case compares to other related work in music AI performance.
-
-After the final project presentations, your last activity for the course will be to participate in a mock single-blind peer review process and review three of your peers' papers.
-
-## Participation
+A discussion-oriented course like this is only productive if students are present and engage. Accordingly, **your attendance in class is _required_.** That said, **please do not come to class if you are ill**. Attendance will be monitored through peer feedback.
 
 TODO
 
