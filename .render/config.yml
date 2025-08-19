@@ -1,6 +1,7 @@
 site_title: "🎵 CMU 15798 F25"
 home_md: "README.md"
 nav:
+  - "Home": "README.md"
   - "Schedule": "schedule.md"
   - "Activities": "activities/index.md"
   - "Syllabus": "syllabus.md"
