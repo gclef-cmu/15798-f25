@@ -1,12 +1,8 @@
 site_title: "🎵 CMU 15798 F25"
 home_md: "README.md"
 nav:
-  - README.md: "Home"
-  - schedule.md: "Schedule"
-  - syllabus.md: "Syllabus"
-  - resources.md: "Resources"
-  - https://piazza.com/cmu/fall2025/15798: "Piazza"
-style:
-  nav_background: "#C41230"
-  nav_title_color: "#FFFFFF"
-  nav_link_color: "#FFFFFF"
+  - "Home": "README.md"
+  - "Schedule": "schedule.md"
+  - "Syllabus": "syllabus.md"
+  - "Resources": "resources.md"
+  - "Piazza": "https://piazza.com/cmu/fall2025/15798"

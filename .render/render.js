@@ -6,7 +6,13 @@ const { JSDOM } = require("jsdom");
 const yaml = require("js-yaml");
 const crypto = require("crypto");
 
+const REPO_ROOT = process.cwd();
+const RENDER_ROOT = path.join(REPO_ROOT, ".render");
+const OUTPUT_ROOT = path.join(REPO_ROOT, "_site");
+
+// ================================
 // Markdown renderer configuration
+// ================================
 marked.setOptions({
     headerIds: true,
     mangle: false,
@@ -20,7 +26,10 @@ marked.setOptions({
     },
 });
 
-// Helpers
+// ================================
+// Helpers (no side effects)
+// ================================
+/* Escape special HTML characters in a string. */
 function escapeHtml(text) {
     const map = {
         "&": "&amp;",
@@ -32,37 +41,41 @@ function escapeHtml(text) {
     return text.replace(/[&<>"']/g, (m) => map[m]);
 }
 
-async function loadConfig(repoRoot) {
-    const configPath = path.join(repoRoot, ".render", "config.yml");
-    const raw = await fs.readFile(configPath, "utf-8");
-    const cfg = yaml.load(raw) || {};
-    if (typeof cfg.site_title !== "string")
-        throw new Error(
-            ".render/config.yml missing required string: site_title"
-        );
-    if (typeof cfg.home_md !== "string")
-        throw new Error(".render/config.yml missing required string: home_md");
-    if (!Array.isArray(cfg.nav))
-        throw new Error(
-            ".render/config.yml missing required array: nav (can be empty)"
-        );
-    return cfg;
+// Add id attributes to headings (simple deterministic slug)
+function addHeadingIds(htmlContent) {
+    const dom = new JSDOM(`<!DOCTYPE html><body>${htmlContent}</body>`);
+    const document = dom.window.document;
+    const used = new Set();
+    function slugify(text) {
+        return String(text || "")
+            .toLowerCase()
+            .replace(/<[^>]*>/g, "")
+            .trim()
+            .replace(/[^\w\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-");
+    }
+    document.querySelectorAll("h1,h2,h3,h4,h5,h6").forEach((h) => {
+        const base = slugify(h.textContent);
+        let id = base;
+        let i = 1;
+        while (id && used.has(id)) id = `${base}-${i++}`;
+        if (id) {
+            h.setAttribute("id", id);
+            used.add(id);
+        }
+    });
+    return document.body.innerHTML;
 }
 
-async function readFirstH1(mdAbsPath) {
-    const raw = await fs.readFile(mdAbsPath, "utf-8");
-    const m = raw.match(/^#\s+(.+)$/m);
-    return m ? m[1].trim() : null;
-}
-
-async function findMarkdownFilesRecursively(startDir) {
-    const results = [];
+/* Recursively walk files under startDir (excluding hidden/system dirs) and invoke onFile for each file. */
+async function walkFiles(startDir, onFile) {
     const excludeNames = new Set([
-        "node_modules",
         ".git",
-        "_site",
-        ".render",
         ".github",
+        ".render",
+        "_site",
+        "node_modules",
     ]);
     async function walk(dir) {
         const entries = await fs.readdir(dir, { withFileTypes: true });
@@ -72,323 +85,314 @@ async function findMarkdownFilesRecursively(startDir) {
             const fullPath = path.join(dir, entry.name);
             if (entry.isDirectory()) {
                 await walk(fullPath);
-            } else if (entry.isFile() && /\.md$/i.test(entry.name)) {
-                results.push(fullPath);
+            } else if (entry.isFile()) {
+                await onFile(fullPath);
             }
         }
     }
     await walk(startDir);
+}
+
+/* Collect absolute paths of .md files under startDir. */
+async function findMarkdownFiles(startDir) {
+    const results = [];
+    await walkFiles(startDir, async (fullPath) => {
+        if (/\.md$/i.test(fullPath)) results.push(fullPath);
+    });
     return results;
 }
 
-async function copyStaticAssets(repoRoot, outputRoot) {
-    // Copy everything except dotfiles/dirs and _site/.render
-    const excludeNames = new Set(["_site", ".render"]);
-    async function walk(dir) {
-        const entries = await fs.readdir(dir, { withFileTypes: true });
-        for (const entry of entries) {
-            if (entry.name.startsWith(".")) continue;
-            if (excludeNames.has(entry.name)) continue;
-            const fullPath = path.join(dir, entry.name);
-            if (entry.isDirectory()) {
-                await walk(fullPath);
-            } else if (entry.isFile()) {
-                const rel = path.relative(repoRoot, fullPath);
-                const dest = path.join(outputRoot, rel);
-                await fs.mkdir(path.dirname(dest), { recursive: true });
-                await fs.copyFile(fullPath, dest);
-            }
-        }
-    }
-    await walk(repoRoot);
+/* Copy entire tree from startDir to outputDir, preserving structure. */
+async function copyTree(startDir, outputDir) {
+    await walkFiles(startDir, async (fullPath) => {
+        const rel = path.relative(startDir, fullPath);
+        const dest = path.join(outputDir, rel);
+        await fs.mkdir(path.dirname(dest), { recursive: true });
+        await fs.copyFile(fullPath, dest);
+    });
 }
 
-function computeOutputHtmlPath(mdPath, repoRoot, outputRoot, homeMdBasename) {
-    const rel = path.relative(repoRoot, mdPath);
+/* Parse leading YAML frontmatter from markdown; returns {attributes, body}. */
+function parseYamlFrontmatter(md) {
+    const m = String(md).match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
+    if (!m) return { attributes: {}, body: String(md) };
+    let attributes = {};
+    try {
+        attributes = yaml.load(m[1]) || {};
+    } catch {
+        attributes = {};
+    }
+    const body = String(md).slice(m[0].length);
+    return { attributes, body };
+}
+
+/* Extract the first H1 heading text from markdown or throw if none. */
+function parseFirstH1(md) {
+    const m = String(md).match(/^\s{0,3}#\s+(.+)$/m);
+    if (!m) throw new Error("No H1 header found");
+    return m[1].trim();
+}
+
+// ================================
+// Simplified path handling
+// ================================
+/*
+Map a source .md path to its output HTML file path. Examples:
+
+- README.md -> _site/index.html (home page)
+- foo.md -> _site/foo/index.html
+- foo/index.md -> _site/foo/index.html
+- foo/bar.md -> _site/foo/bar/index.html
+- foo/bar/index.md -> _site/foo/bar/index.html
+*/
+function computeOutputHtmlPath(mdPath, homeMdBasename) {
+    const rel = path.relative(REPO_ROOT, mdPath);
     const base = path.basename(rel);
     const dir = path.dirname(rel);
-    if (base.toLowerCase() === homeMdBasename.toLowerCase() && dir === ".") {
-        return path.join(outputRoot, "index.html");
+
+    // Home page special cases
+    // - Configured home page
+    // - Conventional root README.md
+    if (dir === "." && (base === homeMdBasename || base === "README.md")) {
+        return path.join(OUTPUT_ROOT, "index.html");
     }
-    if (base.toLowerCase() === "readme.md" && dir !== ".") {
-        return path.join(outputRoot, dir, "index.html");
+
+    // 404 page special case at repo root
+    if (dir === "." && base === "404.md") {
+        return path.join(OUTPUT_ROOT, "404.html");
     }
+
+    // Index.md special case
+    if (base === "index.md") {
+        return path.join(OUTPUT_ROOT, dir, "index.html");
+    }
+
+    // Everything else becomes dir/name/index.html
     const name = base.replace(/\.md$/i, "");
     return path.join(
-        outputRoot,
+        OUTPUT_ROOT,
         dir === "." ? name : path.join(dir, name),
         "index.html"
     );
 }
 
-function toRelativeHref(fromDir, toFile) {
-    let rel = path.relative(fromDir, toFile).split(path.sep).join("/");
-    if (rel === "") rel = "index.html";
-    return rel;
-}
-
-function toExtensionlessPath(href) {
-    if (href.endsWith("/index.html"))
-        return href.slice(0, -"/index.html".length);
-    if (href === "index.html") return "";
-    if (href.endsWith("index.html")) return href.slice(0, -"index.html".length);
-    if (href.endsWith(".html")) return href.slice(0, -5);
-    return href;
-}
-
-function rewriteLinksHtml(
-    htmlContent,
-    sourceMdPath,
-    repoRoot,
-    outputRoot,
-    homeMdBasename
-) {
+/*
+Rewrite links/resources in rendered HTML (KISS):
+- Leave hrefs and their anchors as-authored (no slug normalization, no .md rewriting)
+- Rebase asset src paths relative to the output page directory
+- Skip external links and mailto/tel
+*/
+function rebaseAssetSrcPaths(htmlContent, sourceMdPath, currentOutPath) {
     const dom = new JSDOM(`<!DOCTYPE html><body>${htmlContent}</body>`);
     const document = dom.window.document;
-    const sourceOutDir = path.dirname(
-        computeOutputHtmlPath(
-            sourceMdPath,
-            repoRoot,
-            outputRoot,
-            homeMdBasename
-        )
-    );
-    const processAttr = (el, attrName) => {
-        const raw = el.getAttribute(attrName);
-        if (!raw) return;
-        if (/^(https?:)?\/\//i.test(raw)) return;
-        if (/^(mailto:|tel:)/i.test(raw)) return;
-        if (raw.startsWith("#")) return;
-        let url = raw;
-        let hash = "";
-        let query = "";
-        const hashIdx = url.indexOf("#");
-        if (hashIdx >= 0) {
-            hash = url.slice(hashIdx);
-            url = url.slice(0, hashIdx);
-        }
-        const queryIdx = url.indexOf("?");
-        if (queryIdx >= 0) {
-            query = url.slice(queryIdx);
-            url = url.slice(0, queryIdx);
-        }
-        const resolvedTarget = path.resolve(
-            path.dirname(sourceMdPath),
-            decodeURI(url)
-        );
-        let targetOutputAbs;
-        if (/\.md$/i.test(url)) {
-            targetOutputAbs = computeOutputHtmlPath(
-                resolvedTarget,
-                repoRoot,
-                outputRoot,
-                homeMdBasename
-            );
-        } else {
-            const rel = path.relative(repoRoot, resolvedTarget);
-            targetOutputAbs = path.join(outputRoot, rel);
-        }
-        let relativeHref = toRelativeHref(sourceOutDir, targetOutputAbs);
-        if (/\.md$/i.test(url)) {
-            relativeHref = toExtensionlessPath(relativeHref);
-            if (relativeHref === "") relativeHref = ".";
-        }
-        relativeHref = relativeHref + query + hash;
-        el.setAttribute(attrName, relativeHref);
-    };
-    document.querySelectorAll("a[href]").forEach((a) => processAttr(a, "href"));
+    const sourceDir = path.dirname(sourceMdPath);
+    const currentDir = path.dirname(currentOutPath);
+
     document
         .querySelectorAll(
-            "img[src], video[src], audio[src], source[src], link[href], script[src]"
+            "a[href], img[src], video[src], audio[src], source[src], link[href], script[src]"
         )
         .forEach((el) => {
-            if (el.hasAttribute("src")) processAttr(el, "src");
-            if (el.hasAttribute("href")) processAttr(el, "href");
+            const isHref = el.hasAttribute("href");
+            const attr = isHref ? "href" : "src";
+            const raw = el.getAttribute(attr);
+            if (typeof raw !== "string" || raw.length === 0) return;
+
+            // Skip external links
+            if (/^(https?:)?\/\//i.test(raw)) return;
+            if (/^(mailto:|tel:)/i.test(raw)) return;
+
+            // Keep pure anchors as-authored
+            if (raw.startsWith("#")) return;
+
+            // Split into [path+query] and [hash]
+            const hashIndex = raw.indexOf("#");
+            const baseAndQuery = hashIndex >= 0 ? raw.slice(0, hashIndex) : raw;
+            const anchorPart = hashIndex >= 0 ? raw.slice(hashIndex + 1) : "";
+
+            // Further split base into [path] and [query]
+            const qIndex = baseAndQuery.indexOf("?");
+            let pathPart =
+                qIndex >= 0 ? baseAndQuery.slice(0, qIndex) : baseAndQuery;
+            const queryPart = qIndex >= 0 ? baseAndQuery.slice(qIndex) : "";
+
+            // Adjust paths
+            if (!isHref) {
+                // For assets: rebase relative to output location
+                // Resolve asset absolute path based on source markdown file location
+                const assetAbs = path.resolve(sourceDir, decodeURI(pathPart));
+                const assetRelFromRepo = path.relative(REPO_ROOT, assetAbs);
+                const assetOutPath = path.join(OUTPUT_ROOT, assetRelFromRepo);
+                // Compute path from current output dir to the asset's output path
+                pathPart = path
+                    .relative(currentDir, assetOutPath)
+                    .split(path.sep)
+                    .join("/");
+            }
+
+            // Reconstruct without modifying the anchor
+            const hash = anchorPart ? "#" + anchorPart : "";
+            let newValue = pathPart + queryPart + hash;
+            if (newValue === "" && isHref) newValue = ".";
+
+            el.setAttribute(attr, newValue);
         });
+
     return document.body.innerHTML;
 }
 
-async function copyStylesheet(repoRoot, outputRoot) {
-    const src = path.join(repoRoot, ".render", "template", "style.css");
-    const outDir = path.join(outputRoot, "assets");
+/* Copy template stylesheet to versioned asset path (content-hash) and return its destination path. */
+async function copyStylesheet() {
+    const src = path.join(RENDER_ROOT, "template", "style.css");
+    const outDir = path.join(OUTPUT_ROOT, "assets");
     await fs.mkdir(outDir, { recursive: true });
-    try {
-        const css = await fs.readFile(src);
-        const hash = crypto
-            .createHash("sha1")
-            .update(css)
-            .digest("hex")
-            .slice(0, 8);
-        const filename = `style.${hash}.css`;
-        const dest = path.join(outDir, filename);
-        await fs.writeFile(dest, css);
-        return dest;
-    } catch {
-        return null;
-    }
+
+    const css = await fs.readFile(src);
+    const hash = crypto
+        .createHash("sha1")
+        .update(css)
+        .digest("hex")
+        .slice(0, 8);
+    const dest = path.join(outDir, `style.${hash}.css`);
+    await fs.writeFile(dest, css);
+    return dest;
 }
 
-async function readTemplate(repoRoot) {
-    const templatePath = path.join(
-        repoRoot,
-        ".render",
-        "template",
-        "index.html"
-    );
-    return fs.readFile(templatePath, "utf-8");
-}
-
-function buildConfiguredTitleMap(nav) {
-    const byBase = {};
-    for (const item of nav) {
-        if (item && typeof item === "object") {
-            const key = Object.keys(item)[0];
-            byBase[path.basename(key)] = String(item[key]);
+// ================================
+// Simplified nav handling
+// ================================
+/*
+Build nav items strictly from config.nav using { Title: "href" } mapping:
+- href: external URL (http/https, mailto, tel) or .md file path
+- title: used as-is
+*/
+async function buildNavItems(config, homeMdBasename) {
+    const results = [];
+    for (const item of config.nav) {
+        if (!item || typeof item !== "object") {
+            throw new Error(
+                'config.nav items must be objects like { Title: "href" }'
+            );
         }
+
+        const title = Object.keys(item)[0];
+        const href = item[title];
+
+        if (typeof title !== "string" || !title.trim()) {
+            throw new Error("config.nav item is missing a non-empty title key");
+        }
+        if (typeof href !== "string" || !href.trim()) {
+            throw new Error(
+                `config.nav item '${title}' is missing a non-empty href value`
+            );
+        }
+
+        // External links
+        if (/^(https?:)?\/\//i.test(href) || /^(mailto:|tel:)/i.test(href)) {
+            results.push({ type: "external", href, title });
+            continue;
+        }
+
+        // Internal markdown files only
+        if (/\.md$/i.test(href)) {
+            const mdPath = path.join(REPO_ROOT, href);
+            results.push({
+                type: "internal",
+                mdPath,
+                title,
+                outPath: computeOutputHtmlPath(mdPath, homeMdBasename),
+            });
+            continue;
+        }
+
+        throw new Error(
+            `config.nav item '${title}' has unsupported href '${href}'. Use a .md file path or an external URL.`
+        );
     }
-    return byBase;
+
+    return results;
 }
 
-async function buildNavItems(config, repoRoot, outputRoot, homeMdBasename) {
-    const items = await Promise.all(
-        config.nav
-            .map((item) => {
-                if (typeof item === "string") return { key: item, title: null };
-                if (item && typeof item === "object") {
-                    const key = Object.keys(item)[0];
-                    return { key, title: item[key] };
-                }
-                return null;
-            })
-            .filter(Boolean)
-            .map(async (entry) => {
-                const key = entry.key;
-                const isInternal = /\.md$/i.test(key);
-                if (isInternal) {
-                    const mdPath = path.join(repoRoot, key);
-                    let title = entry.title
-                        ? String(entry.title)
-                        : (await readFirstH1(mdPath)) ||
-                          (path.basename(mdPath).toLowerCase() ===
-                              homeMdBasename.toLowerCase() &&
-                          path.dirname(mdPath) === repoRoot
-                              ? "Home"
-                              : path.basename(mdPath).replace(/\.md$/i, ""));
-                    return {
-                        type: "internal",
-                        mdPath,
-                        title,
-                        outPath: computeOutputHtmlPath(
-                            mdPath,
-                            repoRoot,
-                            outputRoot,
-                            homeMdBasename
-                        ),
-                    };
-                } else {
-                    const href = key;
-                    const title = entry.title ? String(entry.title) : href;
-                    return { type: "external", href, title };
-                }
-            })
-    );
-    return items;
-}
-
+/* Render the site navigation HTML using the nav template. */
 function buildNavHtml(
     navItems,
-    currentOutDir,
+    currentOutPath,
     siteTitle,
-    homeOutPathAbsolute,
-    styleOpts
+    homeOutPath,
+    navTemplate
 ) {
-    const { navBackground, navTitleColor, navLinkColor } = styleOpts || {};
+    const currentDir = path.dirname(currentOutPath);
+    const homeHref =
+        path
+            .relative(currentDir, homeOutPath)
+            .split(path.sep)
+            .join("/")
+            .replace(/(?:^|\/)index\.html$/, "") || ".";
+
     const links = navItems.map((item) => {
-        const colorStyle = navLinkColor
-            ? ` color:${escapeHtml(navLinkColor)};`
-            : "";
         if (item.type === "external") {
             return `<a href="${escapeHtml(
                 item.href
-            )}" style="margin-right:12px;${colorStyle}" target="_blank" rel="noopener noreferrer">${escapeHtml(
-                item.title
-            )}</a>`;
-        } else {
-            const hrefFile = toRelativeHref(currentOutDir, item.outPath);
-            const href = toExtensionlessPath(hrefFile);
-            return `<a href="${href}" style="margin-right:12px;${colorStyle}">${escapeHtml(
+            )}" target="_blank" rel="noopener noreferrer">${escapeHtml(
                 item.title
             )}</a>`;
         }
+
+        let href =
+            path
+                .relative(currentDir, item.outPath)
+                .split(path.sep)
+                .join("/")
+                .replace(/(?:^|\/)index\.html$/, "") || ".";
+
+        return `<a href="${href}">${escapeHtml(item.title)}</a>`;
     });
-    const homeHrefFile = toRelativeHref(currentOutDir, homeOutPathAbsolute);
-    let homeHref = toExtensionlessPath(homeHrefFile);
-    if (homeHref === "") homeHref = ".";
-    const navStyle = navBackground
-        ? ` style="background:${escapeHtml(navBackground)}"`
-        : "";
-    const titleColorStyle = navTitleColor
-        ? ` style="color:${escapeHtml(navTitleColor)}"`
-        : "";
-    const titleHtml = siteTitle
-        ? `<a href="${homeHref}" class="site-title"${titleColorStyle}>${escapeHtml(
-              siteTitle
-          )}</a>`
-        : "";
-    return `
-<nav class="site-nav"${navStyle}>
-  <div class="container">
-    <div class="inner">${titleHtml}<span class="site-links">${links.join(
-        " "
-    )}</span></div>
-  </div>
-</nav>
-`;
+
+    const titleHtml = `<a href="${homeHref}" class="site-title">${escapeHtml(
+        siteTitle
+    )}</a>`;
+
+    return navTemplate
+        .replace("{{TITLE_HTML}}", titleHtml)
+        .replace("{{LINKS_HTML}}", links.join(" "));
 }
 
-function computePageTitle(
-    mdPath,
-    markdownContent,
-    repoRoot,
-    homeMdBasename,
-    configuredTitleByBase
-) {
-    const base = path.basename(mdPath);
-    if (configuredTitleByBase[base]) return configuredTitleByBase[base];
-    const h1Match = markdownContent.match(/^#\s+(.+)$/m);
-    if (h1Match) return h1Match[1].trim();
-    if (
-        path.dirname(mdPath) === repoRoot &&
-        base.toLowerCase() === homeMdBasename.toLowerCase()
-    )
-        return "Home";
-    return base.replace(/\.md$/i, "");
+// ================================
+// Main rendering
+// ================================
+/* Load and validate .render/config.yml; fills defaults and ensures required keys. */
+async function loadConfig() {
+    const configPath = path.join(REPO_ROOT, ".render", "config.yml");
+    const raw = await fs.readFile(configPath, "utf-8");
+    const cfg = yaml.load(raw) || {};
+
+    if (!cfg.site_title) throw new Error("Missing site_title in config");
+    if (!cfg.home_md) throw new Error("Missing home_md in config");
+    if (!Array.isArray(cfg.nav)) cfg.nav = [];
+
+    return cfg;
 }
 
-function extractDescription(htmlContent) {
-    const descMatch = htmlContent.match(/<p>(.+?)<\/p>/);
-    return descMatch
-        ? descMatch[1].replace(/<[^>]*>/g, "").substring(0, 160)
-        : "Documentation";
-}
-
+/*
+Render a single markdown file to an HTML page:
+- Parses frontmatter and title
+- Converts markdown to sanitized HTML
+- Rewrites links and injects nav/stylesheet into the template
+- Writes the final HTML to the computed output path
+*/
 async function renderPage(mdPath, ctx) {
-    const {
-        repoRoot,
-        outputRoot,
-        templateContent,
-        purify,
-        homeMdBasename,
-        navItems,
-        siteTitle,
-        styleOpts,
-        stylesheetOut,
-        configuredTitleByBase,
-        homeOutPathAbsolute,
-    } = ctx;
-    const markdownContent = await fs.readFile(mdPath, "utf-8");
-    let htmlContent = marked(markdownContent);
-    htmlContent = purify.sanitize(htmlContent, {
+    const { template, purify, navItems, stylesheet, config, navTemplate } = ctx;
+    const homeMdBasename = path.basename(config.home_md);
+
+    // Parse markdown
+    const raw = await fs.readFile(mdPath, "utf-8");
+    const { attributes: frontmatter, body } = parseYamlFrontmatter(raw);
+
+    // Convert to HTML
+    let html = marked(body);
+
+    // Configure DOMPurify to preserve IDs on headings
+    html = purify.sanitize(html, {
         ADD_TAGS: ["iframe", "video", "audio", "source"],
         ADD_ATTR: [
             "target",
@@ -399,110 +403,140 @@ async function renderPage(mdPath, ctx) {
             "controls",
         ],
         ALLOW_DATA_ATTR: true,
+        // Allow ID attribute on all elements (especially headings)
+        ALLOWED_ATTR: [
+            "href",
+            "title",
+            "id",
+            "class",
+            "src",
+            "alt",
+            "target",
+            "rel",
+            "frameborder",
+            "allowfullscreen",
+            "autoplay",
+            "controls",
+            "width",
+            "height",
+        ],
     });
-    htmlContent = rewriteLinksHtml(
-        htmlContent,
-        mdPath,
-        repoRoot,
-        outputRoot,
+
+    // Compute current page output path to correctly rebase assets
+    const pageOut = computeOutputHtmlPath(mdPath, homeMdBasename);
+
+    // Add heading ids and rebase asset src paths
+    html = addHeadingIds(html);
+    html = rebaseAssetSrcPaths(html, mdPath, pageOut);
+
+    // Extract title with priority: frontmatter.title -> first H1 -> config.site_title
+    let title;
+    if (
+        frontmatter &&
+        typeof frontmatter.title === "string" &&
+        frontmatter.title.trim()
+    ) {
+        title = String(frontmatter.title).trim();
+    } else {
+        try {
+            title = parseFirstH1(body);
+        } catch {
+            title = config.site_title;
+        }
+    }
+
+    // Extract description with priority: frontmatter.description -> title
+    let description;
+    if (
+        frontmatter &&
+        typeof frontmatter.description === "string" &&
+        frontmatter.description.trim()
+    ) {
+        description = String(frontmatter.description).trim();
+    } else {
+        description = title;
+    }
+
+    // Build nav
+    const homeOut = computeOutputHtmlPath(
+        path.join(REPO_ROOT, config.home_md),
         homeMdBasename
     );
-    const title = computePageTitle(
-        mdPath,
-        markdownContent,
-        repoRoot,
-        homeMdBasename,
-        configuredTitleByBase
+    const nav = buildNavHtml(
+        navItems,
+        pageOut,
+        config.site_title,
+        homeOut,
+        navTemplate
     );
-    const description = extractDescription(htmlContent);
-    const pageOutputPath = computeOutputHtmlPath(
-        mdPath,
-        repoRoot,
-        outputRoot,
-        homeMdBasename
-    );
-    const navHtml = navItems.length
-        ? buildNavHtml(
-              navItems,
-              path.dirname(pageOutputPath),
-              siteTitle,
-              homeOutPathAbsolute,
-              styleOpts
-          )
-        : "";
-    const stylesheetHref = stylesheetOut
-        ? toRelativeHref(path.dirname(pageOutputPath), stylesheetOut).replace(
-              /\\/g,
-              "/"
-          )
-        : "";
-    const finalHtml = templateContent
+
+    // Get stylesheet path
+    const stylePath = path
+        .relative(path.dirname(pageOut), stylesheet)
+        .split(path.sep)
+        .join("/");
+
+    // Build final HTML
+    const finalHtml = template
         .replace("{{TITLE}}", escapeHtml(title))
         .replace("{{DESCRIPTION}}", escapeHtml(description))
-        .replace("{{NAV}}", navHtml)
-        .replace("{{STYLESHEET_HREF}}", stylesheetHref)
-        .replace("{{CONTENT}}", htmlContent);
-    await fs.mkdir(path.dirname(pageOutputPath), { recursive: true });
-    await fs.writeFile(pageOutputPath, finalHtml);
+        .replace("{{NAV}}", nav)
+        .replace("{{STYLESHEET_HREF}}", stylePath)
+        .replace("{{CONTENT}}", html);
+
+    // Write file
+    await fs.mkdir(path.dirname(pageOut), { recursive: true });
+    await fs.writeFile(pageOut, finalHtml);
+
     console.log(
-        `✅ Built: ${path.relative(repoRoot, mdPath)} -> ${path.relative(
-            repoRoot,
-            pageOutputPath
+        `✅ ${path.relative(REPO_ROOT, mdPath)} -> ${path.relative(
+            REPO_ROOT,
+            pageOut
         )}`
     );
 }
 
+// (Removed helper; 404 is now rendered from 404.md like any other page)
+
+/*
+End-to-end site build:
+- Loads template/config, copies stylesheet, builds nav, copies static files
+- Renders all markdown files into the output directory
+*/
 async function buildSite() {
-    const repoRoot = process.cwd();
-    const outputRoot = path.join(repoRoot, "_site");
-    const templateContent = await readTemplate(repoRoot);
-    const config = await loadConfig(repoRoot);
-    const homeMdBasename = path.basename(config.home_md);
-    const stylesheetOut = await copyStylesheet(repoRoot, outputRoot);
-    await copyStaticAssets(repoRoot, outputRoot);
-    const allMarkdownFiles = await findMarkdownFilesRecursively(repoRoot);
-    const navItems = await buildNavItems(
-        config,
-        repoRoot,
-        outputRoot,
-        homeMdBasename
+    // Load everything
+    const template = await fs.readFile(
+        path.join(RENDER_ROOT, "template", "index.html"),
+        "utf-8"
     );
-    const configuredTitleByBase = buildConfiguredTitleMap(config.nav);
-    const homeAbs = path.join(repoRoot, config.home_md);
-    const homeOutPathAbsolute = computeOutputHtmlPath(
-        homeAbs,
-        repoRoot,
-        outputRoot,
-        homeMdBasename
+    const navTemplate = await fs.readFile(
+        path.join(RENDER_ROOT, "template", "nav.html"),
+        "utf-8"
     );
-    const style = config.style || {};
-    const styleOpts = {
-        navBackground: style.nav_background || null,
-        navTitleColor: style.nav_title_color || null,
-        navLinkColor: style.nav_link_color || null,
-    };
+    const config = await loadConfig();
+    const stylesheet = await copyStylesheet();
+    const navItems = await buildNavItems(config, path.basename(config.home_md));
     const purify = DOMPurify(new JSDOM("").window);
-    for (const mdPath of allMarkdownFiles) {
+
+    // Copy static files
+    await copyTree(REPO_ROOT, OUTPUT_ROOT);
+
+    // Render all markdown
+    const mdFiles = await findMarkdownFiles(REPO_ROOT);
+    for (const mdPath of mdFiles) {
         await renderPage(mdPath, {
-            repoRoot,
-            outputRoot,
-            templateContent,
+            template,
             purify,
-            homeMdBasename,
             navItems,
-            siteTitle: config.site_title,
-            styleOpts,
-            stylesheetOut,
-            configuredTitleByBase,
-            homeOutPathAbsolute,
+            stylesheet,
+            config,
+            navTemplate,
         });
     }
-    console.log("📁 Output directory:", outputRoot);
-    console.log(
-        navItems.length
-            ? `🧭 Pages in nav: ${navItems.map((n) => n.title).join(", ")}`
-            : "🧭 No nav configured"
-    );
+
+    console.log(`📁 Output: ${OUTPUT_ROOT}`);
+
+    // 404 will be generated from root 404.md if present
 }
 
 buildSite();
