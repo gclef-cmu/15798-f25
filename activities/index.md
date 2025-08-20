@@ -14,8 +14,8 @@ While you are of course welcome to read as many papers as you like, **we advise 
 
 - Monitor the [schedule](https://docs.google.com/spreadsheets/d/12Kafr6aprZ4euIV9A94T6k2lGxY6Tak4X1Se9j-9NcI) for the papers you are expected to read
   - Reading 1 is always mandatory
-  - Reading 2 is default optional, though occasionally will be mandatory
-- Direct your focus to the information from the paper pertaining to the "Focus" column
+  - Reading 2 is default optional, though occasionally will be mandatory (see spreadsheet)
+- Use the "Focus" column of the spreadsheet to allocate your time and attention towards the most relevant aspects of the paper
 - Read the papers and [submit reading reflections](https://forms.gle/X1utGvYQXzdfkupv8) on each no later than 11:59P on the day before class
 - Participate in in-class discussions for 3-4 papers per week (including optional papers which will be presented by your peers)
 
@@ -79,7 +79,7 @@ In the second half of the semester, you will complete an [open-ended research pr
 
 The class project will prepare you to conduct original music AI research and reason about your design choices. As a "stretch goal", you might aim to continue your research project after the end of the semester and publish it. You will almost certainly fail to develop something publication-worthy in two months, but aim to do so anyway!
 
-**(Tentative) Working in pairs.** Depending on how pair work goes for open ended sections of assignments, we may consider allowing students to work in pairs of two for their final project as well. This will be confirmed at a later date.
+**Working in pairs.** If you prefer, you may work with at most one other student on your final project. The division of labor must be made _very_ clear at both the proposal and final project submission stage.
 
 ### Expectations and instructions
 
