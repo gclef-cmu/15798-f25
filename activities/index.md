@@ -37,7 +37,19 @@ You will [**submit peer feedback**](https://forms.gle/7ETaHrwV2UU3jxpC9) on all 
 
 ### Presentation format
 
-**TODO**
+Your presentation should address the following questions as appropriate. You should not think of this as a template for _structuring_ your presentation, but instead as questions to address throughout in no particular order:
+
+- What is the **key contribution(s)** of the paper?
+- Why are this paper's contributions **impactful**?
+- What **motivated** this work?
+- If this paper proposes **new methods**, how do those methods work at both a high-level and a low-level?
+- If this paper conducts **experiments**, how do those experiments justify the key claims or contributions?
+- What did you find **surprising** about this paper?
+- What **criticisms** do you have about this paper, if anything?
+- What **future work** does this work point to?
+- Are there **broader consequences** of this work?
+
+Your presentation grade will be derived from peer feedback scores, so please keep the [peer presentation feedback](https://docs.google.com/forms/d/e/1FAIpQLScK8RvrUsbcpHNWUy2IKKhYz-8UZ9O4q-Zr9Cn-jvQ0jcG9Kg/viewform) form in mind when preparing your presentation.
 
 ## Programming assignments
 
