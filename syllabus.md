@@ -21,6 +21,26 @@ Methods for generative AI are increasingly consolidating across modalities. Our 
 
 This is the first time this course has been offered. **Expect some bumps in the road!** Your instructor values candid feedback, so please feel free to [provide anonymous feedback at any time](https://forms.gle/7918wxczytxWu67G9). There will also be an opportunity on Oct 6 to provide anonymous/collective feedback through a session with a representative from CMU's Eberly Center.
 
+## Learning Objectives
+
+By the end of the semester, students will be able to:
+
+- Understand the inner workings of state-of-the-art generative AI systems for music, audio, and beyond
+- Engage with AI research at a scholarly level through written and oral argument
+- Implement, train, and evaluate modern generative AI systems at small scales
+- Conduct original research in generative AI for music and audio
+
+These skills are designed to help you conduct original research in generative AI for multimedia like music, audio, and even language, images or video (many of the methods in generative AI are now standardized across modalities). Such research may be published in music-specific venues (ISMIR, ICASSP, NIME, ICMC, CMJ, etc.) or general AI venues (NeurIPS, ICML, ICLR, etc.). Your participation in written reading reflections and oral discussions on research papers will also help strengthen your general writing and speaking skills in research.
+
+## Prerequisites
+
+- Graduate students in SCS and ECE are admitted without prerequisites, although relevant background coursework is recommended (see below).
+- Other students who have already conducted related research or have relevant background coursework may be admitted at instructor discretion.
+
+**(Informal)** To succeed in the course, it is encouraged that all students have previously taken courses in: AI/ML, deep learning, signal processing, software engineering or programming (especially Python), and algorithms. We will assume background knowledge on fundamental generative AI topics like deep learning architectures and backpropagation.
+
+It is also recommended that students have at least some background knowledge in music (e.g., can play an instrument and read sheet music) or coursework in computer music (e.g., took 15-322/622 at CMU).
+
 ## Major activities for the course
 
 See the [activities](./activities) page for more details and instructions.
@@ -43,32 +63,6 @@ See the [activities](./activities) page for more details and instructions.
 - Propose and execute on an original research project
 - Write a 6+ page paper on your research efforts
 - Present your research to your peers and participate in a single-blind peer reviewing process
-
-## Prerequisites
-
-- Graduate students in SCS and ECE are admitted without prerequisites, although relevant background coursework is recommended (see below).
-- Other students who have already conducted related research or have relevant background coursework may be admitted at instructor discretion.
-
-**(Informal)** To succeed in the course, it is encouraged that all students have previously taken courses in: AI/ML, deep learning, signal processing, software engineering or programming (especially Python), and algorithms. We will assume background knowledge on fundamental generative AI topics like deep learning architectures and backpropagation.
-
-It is also recommended that students have at least some background knowledge in music (e.g., can play an instrument and read sheet music) or coursework in computer music (e.g., took 15-322/622 at CMU).
-
-## Learning Objectives
-
-By the end of the semester, students will be able to:
-
-- Understand the inner workings of state-of-the-art generative AI systems for music, audio, and beyond
-- Engage with AI research at a scholarly level through written and oral argument
-- Implement, train, and evaluate modern generative AI systems at small scales
-- Conduct original research in generative AI for music and audio
-
-These skills are designed to help you conduct original research in generative AI for multimedia like music, audio, and even language, images or video (many of the methods in generative AI are now standardized across modalities). Such research may be published in music-specific venues (ISMIR, ICASSP, NIME, ICMC, CMJ, etc.) or general AI venues (NeurIPS, ICML, ICLR, etc.). Your participation in written reading reflections and oral discussions on research papers will also help strengthen your general writing and speaking skills in research.
-
-## Attendance
-
-A discussion-oriented course is only productive if students are present and engaged. Accordingly, **your attendance in class is _required_**. Attendance will be tracked through the peer feedback forms you will fill out daily.
-
-**Please do not come to class if you are ill**. Send your instructor an email or private message on Piazza and your absence will be excused. When possible, we will provide you with a Zoom link to attend remotely, or share a recording afterwards.
 
 ## Grading
 
@@ -100,11 +94,20 @@ Students will be assigned the following final letter grades, based on calculatio
 
 I reserve the right to adjust these intervals to be more generous, but I will not adjust them to be less so.
 
+## Attendance Policy
+
+A discussion-oriented course is only productive if students are present and engaged. Accordingly, **your attendance in class is _required_**. Attendance will be tracked through the peer feedback forms you will fill out each class. If you fill out peer feedback for a presentation you did not attend, I reserve the right to impose a significant penalty to your grade.
+
+As an exception to the attendance policy: **please do not come to class if you are ill**. Send your instructor an email or private message on Piazza with a brief justification and your absence will be excused. When possible, we will provide you with a Zoom link to attend remotely, or share a recording afterwards.
+
 ## Grading Policies
 
 - **Late-work policy:** I do not accept late work or make-up work, unless you are experiencing an emergency or crisis. In this case I will be happy to work with your advisor, student services, or disability services to develop an ad-hoc make-up plan.
 - **Incomplete policy:** My incomplete policy is the same as my policy for late work: incompletes will only be permitted as part of a make-up plan in collaboration with your advisor, student services, or disability services in case of crisis or emergency.
-- **Attendance policy:** You are required to attend class. This will be factored into your grade implicitly via the peer presentation feedback assessment. If you fill out peer feedback for a presentation you did not attend, I reserve the right to impose a significant penalty to your grade.
+
+## Recording Policy
+
+We will record class sessions via Zoom, including our discussions. These recordings will be released to students in the course through Google Drive. Slides will be posted as well.
 
 ## Learning Resources
 
