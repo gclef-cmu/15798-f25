@@ -10,3 +10,7 @@ Rough timeline (subject to change):
 Hand in all deliverables through [this Google Form](https://forms.gle/N5NdhriDQZzx7Z6H9).
 
 More details will be available before Fall break!
+
+## Project ideas
+
+Forthcoming!

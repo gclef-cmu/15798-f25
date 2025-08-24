@@ -90,7 +90,12 @@ There will be between 3 and 5 quizzes in the course (exact number to be determin
 
 ## Final Project
 
-In the second half of the semester, you will complete an [open-ended research project](./final) in music or audio AI, building on the knowledge gained through reading papers and the implementation skills gained through assignments. Your deliverables are: (1) a 6+ page research report detailing your project, (2) a 10 minute oral presentation on your project during the last week of class, and (3) peer review for 3 of your classmates' projects.
+In the second half of the semester, you will complete an [open-ended research project](./final) in music or audio AI, building on the knowledge gained through reading papers and the implementation skills gained through assignments. Your deliverables include:
+
+1. A proposal due immediately after Fall Break
+2. A 6+ page research report detailing your project
+3. A 10 minute oral presentation on your project during the last week of class
+4. Peer review for 3 of your classmates' projects
 
 The class project will prepare you to conduct original music AI research and reason about your design choices. As a "stretch goal", you might aim to continue your research project after the end of the semester and publish it. You will almost certainly fail to develop something publication-worthy in two months, but aim to do so anyway!
 
