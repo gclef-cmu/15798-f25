@@ -22,7 +22,7 @@ While you are of course welcome to read as many papers as you like, **we advise 
 - Read the papers and [submit reading reflections](https://forms.gle/X1utGvYQXzdfkupv8) on each no later than 11:59P on the day before class
 - Participate in in-class discussions for 3-4 papers per week (including optional papers which will be presented by your peers)
 
-## Presenting papers and providing peer feedback
+## Presenting papers
 
 For 2 papers a semester (one mandatory paper and one optional paper), you will prepare a 15m oral presentation (with slides) on that paper to present to the class. Having students "divide and conquer" a set of optional readings allows us to scale up the number of papers we can cover and discuss as a group, while keeping the individual reading workload manageable.
 
@@ -86,7 +86,7 @@ There will be between 3 and 5 quizzes in the course (exact number to be determin
 - You will have 30m to complete the quiz
 - You may bring as many sheets of paper as you want, though you may not use electronic devices during the quiz
 - Quizzes will contain a mixture of multiple choice and short answer questions
-- We will not offer make-up quizzes except in the case of illness, CMU-approved accomodations, or other extenuating circumstances
+- We will not offer make-up quizzes except in the case of doctor-verified illness, CMU-approved accomodations, or other extenuating circumstances
 
 ## Final Project
 
