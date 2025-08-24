@@ -107,7 +107,7 @@ As an exception to the attendance policy: **please do not come to class if you a
 
 ## Recording Policy
 
-We will record class sessions via Zoom, including our discussions. These recordings will be released to students in the course through Google Drive. Slides will be posted as well.
+We will record class sessions via Zoom, including our discussions. These recordings will be released to students in the course through Google Drive. Slides will be posted as well for both instructor, student, and guest presentations.
 
 ## Learning Resources
 
