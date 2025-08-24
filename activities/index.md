@@ -16,6 +16,9 @@ While you are of course welcome to read as many papers as you like, **we advise 
   - Reading 1 is always mandatory
   - Reading 2 is default optional, though occasionally will be mandatory (see spreadsheet)
 - Use the "Focus" column of the spreadsheet to allocate your time and attention towards the most relevant aspects of the paper
+  - (+) Means pay particular attention to this topic
+  - (-) Means you can safely ignore this topic
+  - Otherwise, read as normal
 - Read the papers and [submit reading reflections](https://forms.gle/X1utGvYQXzdfkupv8) on each no later than 11:59P on the day before class
 - Participate in in-class discussions for 3-4 papers per week (including optional papers which will be presented by your peers)
 
