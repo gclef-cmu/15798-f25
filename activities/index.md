@@ -32,7 +32,7 @@ You will [**submit peer feedback**](https://forms.gle/7ETaHrwV2UU3jxpC9) on all 
 
 - Monitor the [schedule](https://docs.google.com/spreadsheets/d/12Kafr6aprZ4euIV9A94T6k2lGxY6Tak4X1Se9j-9NcI) to see the papers you have been randomly assigned to present
   - Communicate any scheduling conflicts with the instructor by Friday Aug 29
-  - Paper assignments will be made by the end of week 1, once conflicts are known and dust settles on adds / drops
+  - Paper assignments will be made by the start of week 2, once conflicts are known and dust settles on adds / drops
 - Prepare a 15m presentation on your assigned papers w/ a slide deck (PDF, PPT, Keynote, Google Slides are all fine)
 - By 11:59P of the day _before_ your scheduled presentation, submit your slides to this [Google Drive folder](https://drive.google.com/drive/folders/1QvX1UrOk4OeqIiTu_95QQrNeW8xLbHLx?usp=drive_link). Follow the naming convention `15798 F25 - DateCode - {R1,R2} - AndrewID - Some Short Identifier`, e.g., `15798 F25 - 01B - R2 - chrisdon - Jukebox`
 - Present your paper to the class, following the [format](#presentation-format) below
