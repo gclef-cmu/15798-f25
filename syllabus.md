@@ -6,12 +6,15 @@
 - **Units**: 12
 - **Website**: https://gclef-cmu.github.io/15798-f25
 
-## Instructor
+## Teaching staff
 
-- **Name**: [Professor Chris Donahue](https://chrisdonahue.com)
-- **Contact**: Prefer [public Piazza posts](https://piazza.com/cmu/fall2025/15798) for general questions. Otherwise, email for private questions.
-- **Office hours**: Wednesday 2-3p (right after class), Or by appointment
-- **Office location**: GHC 7127
+- **Instructor**: [Professor Chris Donahue](https://chrisdonahue.com)
+  - **Contact**: Prefer [public Piazza posts](https://piazza.com/cmu/fall2025/15798) for general questions. Otherwise, email for private questions.
+  - **Office hours**: Wednesday 2-3p (right after class), Or by appointment
+  - **Office location**: GHC 7127
+- **TA**: [Irmak Bukey](https://irmakbky.github.io)
+  - **Office hours**: TBD
+  - **Office location**: TBD
 
 ## Course Overview
 
@@ -74,11 +77,12 @@ The final course grade will be calculated as follows:
 | Final project                            | 20%                       |
 | Quizzes (3-5)                            | 15%                       |
 | Assignments (3)                          | 15%                       |
-| Peer presentation feedback (~4 per week) | 10% [80% is 100% Rule]    |
 | Paper presentations (2)                  | 10%                       |
+| Peer presentation feedback (~4 per week) | 5% [80% is 100% Rule]     |
+| In class discussions (~2 per week)       | 5% [80% is 100% Rule]     |
 | Final project peer review (3)            | 5%                        |
 
-**Note:** For Reading reflections and Peer presentation feedback, a student need only to participate in 80% of assigned material to score 100% on that assessment. A student who provides feedback on all of their classmate (ie, 100% of talks) would receive 125% for that assessment; a student who provides feedback on 60% of their classmates would receive 75% for that assessment.
+**Note:** For Reading reflections, peer presentation feedback, and in class discussions, a student need only to participate in 80% of assigned material to score 100% on that assessment. A student who provides feedback on all of their classmate (ie, 100% of talks) would receive 125% for that assessment; a student who provides feedback on 60% of their classmates would receive 75% for that assessment.
 
 I also encourage students to read the optional papers. You may submit reading reflections for optional papers if you so choose. These will count towards your total paper count, but with two caveats (1) you must have read >= 80% of the mandatory papers before any optional papers will be counted, and (2) the maximum credit you can get is 130% (32.5% absolute).
 
@@ -96,7 +100,7 @@ I reserve the right to adjust these intervals to be more generous, but I will no
 
 ## Attendance Policy
 
-A discussion-oriented course is only productive if students are present and engaged. Accordingly, **your attendance in class is _required_**. Attendance will be tracked through the peer feedback forms you will fill out each class. If you fill out peer feedback for a presentation you did not attend, I reserve the right to impose a significant penalty to your grade.
+A discussion-oriented course is only productive if students are present and engaged. Accordingly, **your attendance in class is _required_**. Attendance will be tracked through the peer feedback forms / discussion documents you will fill out each class. If you fill out these attendance tracking documents for a presentation you did not attend, I reserve the right to impose a significant penalty to your grade.
 
 As an exception to the attendance policy: **please do not come to class if you are ill**. Send your instructor an email or private message on Piazza with a brief justification and your absence will be excused. When possible, we will provide you with a Zoom link to attend remotely, or share a recording afterwards.
 
