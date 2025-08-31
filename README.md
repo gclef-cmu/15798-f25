@@ -14,7 +14,10 @@
 
 - **Class sessions**: MW 12:30-1:50P, GHC 4101
 - **Instructor**: [Chris Donahue](https://chrisdonahue.com)
-- **Office hours**: W 2-3P (right after class), GHC 7127, or by appointment
+  - **Office hours**: W 2-3P (right after class), GHC 7127, or by appointment
+- **TA**: [Irmak Bukey](https://irmakbky.github.io)
+  - **Office hours**: TBD
+  - **Office location**: TBD
 
 ## Description
 
