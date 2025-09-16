@@ -68,7 +68,7 @@ The two section design of these assignments is also intended to confront the evo
 
 - Complete all assignments following the specific instructions for each below:
   - [**Assignment 1**](https://docs.google.com/document/d/1JV2PEtk9QOTPHmqeQBMsTuAqsJ2NtmBFUo6KTIdHfnw), **due Fri Sep 12, 11:59PM**.
-  - Assignment 2, link forthcoming, **due Fri Sep 26, 11:59PM**.
+  - [**Assignment 2**](https://docs.google.com/document/d/1k8nsgzDTLjh4qWvTCQfh9DIso4iJrpqby-7BHkkMVnE), **due Sat Sep 27, 11:59PM**.
   - Assignment 3, link forthcoming, **due Fri Oct 10, 11:59PM**.
 - Turn in all assignments using [this Google Form](https://forms.gle/BUuyipeayt8ZwrJR8)
 
