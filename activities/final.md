@@ -2,7 +2,7 @@
 
 Rough timeline (subject to change):
 
-- **Oct 19 11:59PM**: Project proposal due
+- **Fri Oct 24 11:59PM**: Project proposal due
 - Second half of semester: Project deliverables every week
 - Last week of class: Present in class to peers, paper due
 - After last week of class: Peer review
