@@ -21,3 +21,15 @@ Here is a selection of demo videos from the open ended section of [Assignment 1 
 ## (Stone Ye) Improving generation quality with BigVGAN and adding a frontend
 
 <video src="1/yushiye.mp4" controls></video>
+
+## (Tianyue Ruby Sun) Comparing assignment model to Riffusion V1
+
+<video src="1/tsun3.mp4" controls></video>
+
+## (Zhengfei Li) Evaluating the assignment model with FAD and CLAP
+
+<video src="1/zhengfeil.mp4" controls></video>
+
+## (Liz Chu) Evaluating SI-SDR reconstruction quality of Mel spectrograms
+
+<video src="1/echu2.mp4" controls></video>
