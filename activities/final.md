@@ -108,11 +108,11 @@ The expected draft sections are as follows:
 
 ## Presentation
 
-Information TBD
+TBA
 
 ## Peer review
 
-Information TBD
+TBA
 
 ## Grading
 
