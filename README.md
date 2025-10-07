@@ -5,6 +5,7 @@
 - [**Schedule**](https://docs.google.com/spreadsheets/d/12Kafr6aprZ4euIV9A94T6k2lGxY6Tak4X1Se9j-9NcI)
 - [**Google Drive**](https://drive.google.com/drive/u/0/folders/1NHGBA5EsAI_qbtvE_qUWwPInoPYwCVK7)
 - [**Piazza**](https://piazza.com/cmu/fall2025/15798)
+- [**(NEW) Final Project Guidelines**](./activities/final)
 - [**Syllabus**](./syllabus)
 - [**Reading Reflection Form**](https://forms.gle/X1utGvYQXzdfkupv8)
 - [**Peer Feedback Form**](https://forms.gle/7ETaHrwV2UU3jxpC9)
