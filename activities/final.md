@@ -85,7 +85,9 @@ High-level guidance on project ideation:
 
 Your paper must be 3-6 pages in length of scientific content, plus an unlimited number of pages for broader impact statement, acknowledgements, references, and supplementary material (an appendix).
 
-The technical writing in your final paper submission is expected to be polished to publication-worthy standards. Your final paper submission should read as a full paper w/ all expected sections (e.g., abstract, intro, related work, methods, experiments, discussion, conclusion, broader impacts, etc.).
+The **3 page minimum is just a guideline**. You are expected to include all sections all expected sections as appropriate for your paper (e.g., abstract, intro, related work, methods, experiments, discussion, conclusion, broader impacts, etc.). You can be penalized for an incomplete paper if your submission is 3 pages but missing vital sections.
+
+The technical writing in your final paper submission is expected to be polished to publication-worthy standards.
 
 ### Template
 
