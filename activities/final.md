@@ -64,10 +64,12 @@ If you are uncertain about your direction for any reason (not sure if an idea is
 
 High-level guidance on project ideation:
 
-1. When in doubt, _reduce your scope_. In research you want to be ambitious, though for this class project, I would **strongly prefer to see conclusive answers to narrowly-scoped scientific questions** as opposed to incomplete answers to broadly-scoped questions.
+1. When in doubt, _narrow your scope_. In research you want to be ambitious, though for this class project, I would **strongly prefer to see conclusive answers to narrowly-scoped scientific questions** as opposed to incomplete answers to broadly-scoped questions.
+1. **Think carefully through computing resource constraints**! There are significant limitations to what you can do w/ 100 GPU credits on Colab Pro. You are welcome to use other computing resources if you have access to them, but if you are limited to Colab, please factor this into your project ideation.
 1. **Supervised learning is your friend!** Generative modeling is flashy and fun but quite challenging. I started my research career with a [discrimantive, supervised learning](https://arxiv.org/abs/1703.06891) task before confronting anything generative.
 1. **Pretrained models are your friend!** Our computational resources in this class are _very_ limited. You do not have the resources to train a state-of-the-art music generation model, though you may have the resources to [add a new control capability to a pre-trained model](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10536191), or [design a novel use case for a pre-trained model](https://arxiv.org/pdf/2411.09625)
 1. **Synthetic data is your friend!** Evaluation in music is often quite difficult, but through synthetic data, you can [turn nebulous, subjective concepts into objective evaluations](https://arxiv.org/abs/2503.16669).
+1. **Consider benchmarks or data collection efforts**! These are often well-scoped / high-impact research contributions that don't require a lot of compute.
 1. For this course, your final project **does not have to be completely novel**. E.g., you can reimplement existing methods in a new framework or reproduce results from past work. Though, all of your code and writing is expected to be original work.
 1. Some **potential sources of project ideas** may come from:
    1. A curiosity or unanswered question you encountered when reading a paper in the course
