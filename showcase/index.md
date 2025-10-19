@@ -60,7 +60,7 @@ Here is a selection of demo videos from the open ended section of [Assignment 2 
 
 ## (Zhengfei Li) High throughput MIDI tokenization
 
-<video src="2/zhengfeil.mp4" controls></video>
+<video src="2/zhengfel.mp4" controls></video>
 
 ## (Corinthia Aberle) RNNs -> LSTMs -> Transformers, Relative tokenization
 
