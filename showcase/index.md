@@ -1,3 +1,47 @@
+# Assignment 3
+
+Here is a selection of demo videos from the open ended section of [Assignment 3 (Music Information Retrieval)](https://docs.google.com/document/d/1r_ksTVThDHZJydm8qH4WGqcI2iRDdwT03dvPl0nt0Pk)
+
+## (Lynn Ye) Real-time MIDI beat detection
+
+<video src="3/lynnye.mp4" controls></video>
+
+## (Trey Brosnan) Real-time drumming accompaniment from beat tracking
+
+<video src="3/rbrosnan.mp4" controls></video>
+
+## (Nathan Pruyne) Automatic beat-matched DJ transitions
+
+<video src="3/npruyne.mp4" controls></video>
+
+## (Corinthia Aberle) Chord detection using MERT
+
+<video src="3/caberle.mp4" controls></video>
+
+## (Stone Ye) Score following via beat detection
+
+<video src="3/yushiye.mp4" controls></video>
+
+## (Zhengfei Li) Gemini-based music genre detection
+
+<video src="3/zhengfeil.mp4" controls></video>
+
+## (Alex Wang) Real-time key detection and note suggestions
+
+<video src="3/aw4.mp4" controls></video>
+
+## (Luoyi Zhang) Aligning video effects to detected beats
+
+<video src="3/luoyiz.mp4" controls></video>
+
+## (William Wang) CLAP-based music genre detection
+
+<video src="3/willw2.mp4" controls></video>
+
+## (Yewon Kim) A spotify that quacks
+
+<video src="3/yewonkim.mp4" controls></video>
+
 # Assignment 2
 
 Here is a selection of demo videos from the open ended section of [Assignment 2 (Symbolic Music Language Modeling)](https://docs.google.com/document/d/1k8nsgzDTLjh4qWvTCQfh9DIso4iJrpqby-7BHkkMVnE)
