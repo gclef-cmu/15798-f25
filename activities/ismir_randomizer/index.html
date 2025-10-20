@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>ISMIR Random Paper Picker</title>
+        <style>
+            body {
+                font-family: system-ui, -apple-system, Segoe UI, Roboto,
+                    Helvetica, Arial, sans-serif;
+                margin: 2rem;
+                line-height: 1.5;
+            }
+            h1 {
+                font-size: 1.5rem;
+                margin: 0 0 1rem;
+            }
+            .controls {
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+                flex-wrap: wrap;
+                margin-bottom: 1rem;
+            }
+            label {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            input[type="number"] {
+                width: 6rem;
+                padding: 0.3rem 0.5rem;
+            }
+            button {
+                padding: 0.5rem 0.9rem;
+                font-weight: 600;
+                cursor: pointer;
+            }
+            .result {
+                margin-top: 1rem;
+                padding: 0.75rem;
+                background: #f6f8fa;
+                border: 1px solid #e5e7eb;
+                border-radius: 6px;
+            }
+            .muted {
+                color: #6b7280;
+            }
+            a {
+                color: #0b5bd3;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>ISMIR Random Paper Picker</h1>
+        <div class="controls">
+            <label>
+                Min year
+                <input
+                    id="minYear"
+                    type="number"
+                    value="2017"
+                    min="2000"
+                    max="2100"
+                />
+            </label>
+            <label>
+                Max year
+                <input
+                    id="maxYear"
+                    type="number"
+                    value="2024"
+                    min="2000"
+                    max="2100"
+                />
+            </label>
+            <button id="pickBtn">Pick random paper</button>
+        </div>
+        <div id="status" class="muted">Loading data…</div>
+        <div id="result" class="result" style="display: none"></div>
+
+        <script>
+            (function () {
+                const DATA_URL = "ismir_pdfs_2010_2024.json";
+                /** @type {Record<string, string[]>} */
+                let data = {};
+
+                const statusEl = document.getElementById("status");
+                const resultEl = document.getElementById("result");
+                const pickBtn = document.getElementById("pickBtn");
+                const minInput = document.getElementById("minYear");
+                const maxInput = document.getElementById("maxYear");
+
+                function setStatus(msg) {
+                    statusEl.textContent = msg;
+                }
+
+                function clampYears() {
+                    const min = parseInt(minInput.value, 10);
+                    const max = parseInt(maxInput.value, 10);
+                    if (!Number.isFinite(min) || !Number.isFinite(max))
+                        return null;
+                    if (min > max) return null;
+                    return { min, max };
+                }
+
+                function pickRandom(arr) {
+                    return arr[Math.floor(Math.random() * arr.length)];
+                }
+
+                function buildPool(min, max) {
+                    const pool = [];
+                    for (let y = min; y <= max; y++) {
+                        const key = String(y);
+                        const papers = data[key];
+                        if (Array.isArray(papers) && papers.length > 0) {
+                            for (const url of papers) {
+                                pool.push({ year: y, url });
+                            }
+                        }
+                    }
+                    return pool;
+                }
+
+                function eligibleYears(min, max) {
+                    const years = [];
+                    for (let y = min; y <= max; y++) {
+                        const papers = data[String(y)];
+                        if (Array.isArray(papers) && papers.length > 0) {
+                            years.push(y);
+                        }
+                    }
+                    return years;
+                }
+
+                function renderResult(item) {
+                    resultEl.style.display = "block";
+                    resultEl.innerHTML = "";
+                    if (!item) {
+                        resultEl.textContent =
+                            "No papers found in the selected year range.";
+                        return;
+                    }
+
+                    const year = document.createElement("div");
+                    year.className = "muted";
+                    year.textContent = "Year: " + item.year;
+
+                    const isZenodo =
+                        /(^https?:\/\/)?([^\/]+\.)?zenodo\.org\//.test(
+                            item.url
+                        );
+
+                    // Always provide a primary link
+                    const primaryLink = document.createElement("a");
+                    primaryLink.href = item.url;
+                    primaryLink.target = "_blank";
+                    primaryLink.rel = "noopener noreferrer";
+                    primaryLink.textContent = isZenodo
+                        ? "Open on Zenodo (opens in new tab)"
+                        : "Open PDF in new tab";
+
+                    const note = document.createElement("div");
+                    note.className = "muted";
+                    note.style.marginTop = "0.5rem";
+
+                    resultEl.appendChild(year);
+                    resultEl.appendChild(primaryLink);
+
+                    if (isZenodo) {
+                        // Zenodo frequently forces download; offer Google Viewer in a new tab instead of embedding.
+                        let viewCandidate = item.url;
+                        try {
+                            const u = new URL(item.url);
+                            u.searchParams.delete("download");
+                            viewCandidate = u.toString();
+                        } catch (_) {}
+
+                        const googleViewer =
+                            "https://docs.google.com/gview?embedded=1&url=" +
+                            encodeURIComponent(viewCandidate);
+
+                        note.textContent =
+                            "Zenodo may download instead of previewing. Try Google viewer in a new tab:";
+
+                        const viewerLink = document.createElement("a");
+                        viewerLink.href = googleViewer;
+                        viewerLink.target = "_blank";
+                        viewerLink.rel = "noopener noreferrer";
+                        viewerLink.style.display = "inline-block";
+                        viewerLink.style.marginLeft = "0.5rem";
+                        viewerLink.textContent = "Open with Google viewer";
+
+                        resultEl.appendChild(note);
+                        resultEl.appendChild(viewerLink);
+                    } else {
+                        note.textContent =
+                            "If the PDF does not display below, use the link above.";
+
+                        const iframe = document.createElement("iframe");
+                        iframe.src = item.url;
+                        iframe.style.width = "100%";
+                        iframe.style.height = "80vh";
+                        iframe.style.border = "1px solid #e5e7eb";
+                        iframe.style.borderRadius = "6px";
+                        iframe.style.marginTop = "0.5rem";
+                        iframe.loading = "lazy";
+                        iframe.referrerPolicy = "no-referrer";
+
+                        resultEl.appendChild(note);
+                        resultEl.appendChild(iframe);
+                    }
+                }
+
+                function onPick() {
+                    const yrs = clampYears();
+                    if (!yrs) {
+                        renderResult(null);
+                        setStatus(
+                            "Please provide a valid min/max year (min <= max)."
+                        );
+                        return;
+                    }
+
+                    const years = eligibleYears(yrs.min, yrs.max);
+                    if (years.length === 0) {
+                        renderResult(null);
+                        setStatus(
+                            `No papers found between ${yrs.min} and ${yrs.max}.`
+                        );
+                        return;
+                    }
+
+                    const selectedYear = pickRandom(years);
+                    const papers = data[String(selectedYear)];
+                    if (!Array.isArray(papers) || papers.length === 0) {
+                        renderResult(null);
+                        setStatus(`No papers found for year ${selectedYear}.`);
+                        return;
+                    }
+
+                    const url = pickRandom(papers);
+                    renderResult({ year: selectedYear, url });
+                    setStatus(
+                        `Selected year ${selectedYear} uniformly from ${years.length} eligible years in ${yrs.min}–${yrs.max}.`
+                    );
+                }
+
+                async function init() {
+                    try {
+                        const res = await fetch(DATA_URL, {
+                            cache: "no-store",
+                        });
+                        if (!res.ok)
+                            throw new Error(
+                                "Failed to fetch data: " + res.status
+                            );
+                        data = await res.json();
+                        setStatus("Data loaded. Pick a paper!");
+                    } catch (err) {
+                        console.error(err);
+                        setStatus(
+                            "Failed to load data. Ensure JSON is present next to this page."
+                        );
+                    }
+                }
+
+                pickBtn.addEventListener("click", onPick);
+                minInput.addEventListener("change", () => {
+                    const yrs = clampYears();
+                    if (!yrs) return;
+                });
+                maxInput.addEventListener("change", () => {
+                    const yrs = clampYears();
+                    if (!yrs) return;
+                });
+                init();
+            })();
+        </script>
+    </body>
+</html>
