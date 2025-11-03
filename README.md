@@ -8,7 +8,7 @@
 - [**(NEW) Final Project Guidelines**](./activities/final)
 - [**Syllabus**](./syllabus)
 - [**Reading Reflection Form**](https://forms.gle/X1utGvYQXzdfkupv8)
-- [**Peer Feedback Form**](https://forms.gle/7ETaHrwV2UU3jxpC9)
+- [**(UPDATED) Peer Feedback Form**](https://forms.gle/UVwjwbY2qwsBcEMQ8)
 - [**Assignment Submission Form**](https://forms.gle/BUuyipeayt8ZwrJR8)
 - [**Anonymous Course Feedback Form**](https://forms.gle/7918wxczytxWu67G9)
 

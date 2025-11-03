@@ -26,7 +26,7 @@ While you are of course welcome to read as many papers as you like, **we advise 
 
 For 2 papers a semester (one mandatory paper and one optional paper), you will prepare a 15m oral presentation (with slides) on that paper to present to the class. Having students "divide and conquer" a set of optional readings allows us to scale up the number of papers we can cover and discuss as a group, while keeping the individual reading workload manageable.
 
-You will [**submit peer feedback**](https://forms.gle/7ETaHrwV2UU3jxpC9) on all of the presentations you attend.
+You will [**submit peer feedback**](https://forms.gle/UVwjwbY2qwsBcEMQ8) on all of the presentations you attend.
 
 ### Expectations and instructions
 
@@ -36,7 +36,7 @@ You will [**submit peer feedback**](https://forms.gle/7ETaHrwV2UU3jxpC9) on all 
 - Prepare a 12-16m presentation on your assigned papers w/ a slide deck (PDF, PPT, Keynote, Google Slides are all fine)
 - By 11:59P of the day _before_ your scheduled presentation, submit your slides to this [Google Drive folder](https://drive.google.com/drive/folders/1QvX1UrOk4OeqIiTu_95QQrNeW8xLbHLx?usp=drive_link). Follow the naming convention `15798 F25 - DateCode - {R1,R2} - AndrewID - Some Short Identifier`, e.g., `15798 F25 - 01B - R2 - chrisdon - Jukebox`
 - Present your paper to the class, following the [format](#presentation-format) below
-- Submit [peer feedback](https://forms.gle/7ETaHrwV2UU3jxpC9) on all of the presentations you attend (will be used both to provide presentation feedback for your peers and to track individual attendance)
+- Submit [peer feedback](https://forms.gle/UVwjwbY2qwsBcEMQ8) on all of the presentations you attend (will be used both to provide presentation feedback for your peers and to track individual attendance)
 
 ### Presentation format
 
