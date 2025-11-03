@@ -24,7 +24,7 @@ Here is a selection of demo videos from the open ended section of [Assignment 3 
 
 ## (Zhengfei Li) Gemini-based music genre detection
 
-<video src="3/zhengfeil.mp4" controls></video>
+<video src="3/zhengfel.mp4" controls></video>
 
 ## (Alex Wang) Real-time key detection and note suggestions
 
